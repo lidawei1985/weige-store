@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -122,6 +123,11 @@ public class MainActivity extends Activity {
             showSearch();
             return true;
         }
+        if (code == KeyEvent.KEYCODE_BACK && searchPanel != null
+                && searchPanel.getVisibility() == View.VISIBLE) {
+            closeSearch(false);
+            return true;
+        }
         if (code == KeyEvent.KEYCODE_BACK && !"home".equals(mode)) {
             mode = "home";
             kw = "";
@@ -189,18 +195,19 @@ public class MainActivity extends Activity {
                 out.addAll(all);
             } else {
                 String k = kw.toLowerCase();
-                // 先精确前缀，再包含，命中的排前面
-                List<AppEntry> front = new ArrayList<AppEntry>();
+                List<AppEntry> top = new ArrayList<AppEntry>();
+                List<AppEntry> mid = new ArrayList<AppEntry>();
+                List<AppEntry> low = new ArrayList<AppEntry>();
                 for (AppEntry a : all) {
+                    if (!matchSearch(a, k)) continue;
                     String n = a.name.toLowerCase();
-                    if (n.startsWith(k)) {
-                        front.add(a);
-                    } else if (n.contains(k) || a.desc.toLowerCase().contains(k)) {
-                        out.add(a);
-                    }
+                    if (n.contains(k)) top.add(a);
+                    else if (a.py.toLowerCase().startsWith(k)) mid.add(a);
+                    else low.add(a);
                 }
-                front.addAll(out);
-                out = front;
+                top.addAll(mid);
+                top.addAll(low);
+                out = top;
             }
         } else if ("mine".equals(mode)) {
             // 我的：只列已安装的，可更新的排最前
@@ -476,68 +483,199 @@ public class MainActivity extends Activity {
     }
 
     // ------------------------------------------------------------ 搜索
-    private void showSearch() {
-        View v = LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
-        final EditText input = (EditText) v.findViewById(R.id.sinput);
-        LinearLayout hot = (LinearLayout) v.findViewById(R.id.hotwrap);
-        final CardDialog dlg = new CardDialog(this, v);
-        dlg.show();
+    // 电视上没有实体键盘，系统输入法一弹就遮掉半个屏幕，所以自己做字母键盘。
+    // 索引里带了拼音首字母（py），输入 aqy 就能搜到爱奇艺。
+    private LinearLayout searchPanel;
+    private TextView sqText, sqCount;
+    private TextView firstKey;
 
-        LinearLayout rowLine = null;
-        for (int i = 0; i < HOT.length; i++) {
-            if (i % 4 == 0) {
-                rowLine = new LinearLayout(this);
-                rowLine.setOrientation(LinearLayout.HORIZONTAL);
-                rowLine.setPadding(0, dp(6), 0, 0);
-                hot.addView(rowLine);
+    private void showSearch() {
+        if (searchPanel == null) buildSearchPanel();
+        mode = "search";
+        kw = "";
+        refreshSearchText();
+        searchPanel.setVisibility(View.VISIBLE);
+        // 面板刚显示时子 View 还没布局完，直接 requestFocus 会失败，
+        // 结果就是"按遥控器没反应"，必须等一帧之后
+        searchPanel.post(new Runnable() {
+            public void run() {
+                if (firstKey != null) firstKey.requestFocus();
             }
-            final String k = HOT[i];
-            TextView t = new TextView(this);
-            t.setText(k);
-            t.setTextSize(12);
-            t.setTextColor(getResources().getColorStateList(R.drawable.tab_text));
-            t.setBackgroundResource(R.drawable.tab_bg);
-            t.setPadding(dp(16), dp(7), dp(16), dp(7));
-            t.setFocusable(true);
-            t.setClickable(true);
-            t.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.rightMargin = dp(8);
-            t.setLayoutParams(lp);
-            t.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View x) {
-                    dlg.dismiss();
-                    doSearch(k);
+        });
+    }
+
+    /** apply=true 关掉面板看结果；false 直接退回精选 */
+    private void closeSearch(boolean apply) {
+        if (searchPanel != null) searchPanel.setVisibility(View.GONE);
+        if (!apply) {
+            mode = "home";
+            kw = "";
+            cat = "精选";
+        }
+        buildTabs();
+        applyFilter();
+    }
+
+    private void buildSearchPanel() {
+        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+        searchPanel = new LinearLayout(this);
+        searchPanel.setOrientation(LinearLayout.VERTICAL);
+        searchPanel.setBackgroundColor(0xFF0A0C10);
+        searchPanel.setPadding(dp(48), dp(30), dp(48), dp(22));
+        root.addView(searchPanel, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        TextView t = new TextView(this);
+        t.setText("搜索");
+        t.setTextColor(getResources().getColor(R.color.tx));
+        t.setTextSize(19);
+        searchPanel.addView(t);
+
+        sqText = new TextView(this);
+        sqText.setTextSize(25);
+        sqText.setTextColor(getResources().getColor(R.color.tx));
+        sqText.setPadding(0, dp(10), 0, 0);
+        searchPanel.addView(sqText);
+
+        sqCount = new TextView(this);
+        sqCount.setTextSize(13);
+        sqCount.setTextColor(getResources().getColor(R.color.tx2));
+        sqCount.setPadding(0, dp(4), 0, dp(10));
+        searchPanel.addView(sqCount);
+
+        // 热门词
+        LinearLayout hotRow = new LinearLayout(this);
+        hotRow.setOrientation(LinearLayout.HORIZONTAL);
+        hotRow.setPadding(0, 0, 0, dp(8));
+        for (final String k : HOT) {
+            TextView hv = key(k, 0, 36);
+            hv.setTextSize(12);
+            hv.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    kw = k;
+                    refreshSearchText();
+                    closeSearch(true);
                 }
             });
-            if (rowLine != null) rowLine.addView(t);
+            hotRow.addView(hv);
+        }
+        searchPanel.addView(hotRow);
+
+        // 字母键盘：3 行 9/9/8
+        final java.util.List<TextView> lastRow = new ArrayList<TextView>();
+        String[] rows = {"ABCDEFGHI", "JKLMNOPQR", "STUVWXYZ"};
+        for (int r = 0; r < rows.length; r++) {
+            LinearLayout line = new LinearLayout(this);
+            line.setOrientation(LinearLayout.HORIZONTAL);
+            for (int i = 0; i < rows[r].length(); i++) {
+                final String ch = String.valueOf(rows[r].charAt(i));
+                TextView kb = key(ch, 1, 46);
+                kb.setId(View.generateViewId());
+                kb.setTextSize(17);
+                kb.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        kw = kw + ch.toLowerCase();
+                        refreshSearchText();
+                    }
+                });
+                line.addView(kb);
+                if (firstKey == null) firstKey = kb;
+                if (r == rows.length - 1) lastRow.add(kb);
+            }
+            searchPanel.addView(line);
         }
 
-        v.findViewById(R.id.s_cancel).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View x) {
-                dlg.dismiss();
-            }
-        });
-        v.findViewById(R.id.s_go).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View x) {
-                String q = input.getText().toString().trim();
-                dlg.dismiss();
-                if (q.length() > 0) doSearch(q);
-            }
-        });
-        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView tv, int action, KeyEvent e) {
-                if (action == EditorInfo.IME_ACTION_SEARCH || action == EditorInfo.IME_ACTION_DONE) {
-                    String q = input.getText().toString().trim();
-                    dlg.dismiss();
-                    if (q.length() > 0) doSearch(q);
-                    return true;
+        // 操作行
+        LinearLayout ops = new LinearLayout(this);
+        ops.setOrientation(LinearLayout.HORIZONTAL);
+        ops.setPadding(0, dp(8), 0, 0);
+        TextView del = key("删除", 1, 44);
+        del.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (kw.length() > 0) {
+                    kw = kw.substring(0, kw.length() - 1);
+                    refreshSearchText();
                 }
-                return false;
             }
         });
-        input.requestFocus();
+        del.setId(View.generateViewId());
+        ops.addView(del);
+        TextView clr = key("清空", 1, 44);
+        clr.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                kw = "";
+                refreshSearchText();
+            }
+        });
+        clr.setId(View.generateViewId());
+        ops.addView(clr);
+        TextView go = key("查看结果", 2, 44);
+        go.setTextColor(Color.WHITE);
+        go.setBackgroundResource(R.drawable.btn_primary);
+        go.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                closeSearch(true);
+            }
+        });
+        go.setId(View.generateViewId());
+        ops.addView(go);
+        searchPanel.addView(ops);
+
+        // 遥控器从字母行按「下」要能落到按钮上
+        for (int i = 0; i < lastRow.size(); i++) {
+            lastRow.get(i).setNextFocusDownId(i < 3 ? del.getId() : go.getId());
+        }
+        del.setNextFocusUpId(lastRow.get(0).getId());
+        clr.setNextFocusUpId(lastRow.get(3).getId());
+        go.setNextFocusUpId(lastRow.get(lastRow.size() - 1).getId());
+    }
+
+    /** 造一个可聚焦的键盘按钮；weight=0 表示按内容宽度 */
+    private TextView key(String label, int weight, int height) {
+        TextView v = new TextView(this);
+        v.setText(label);
+        v.setTextSize(14);
+        v.setTextColor(getResources().getColorStateList(R.drawable.tab_text));
+        v.setBackgroundResource(R.drawable.tab_bg);
+        v.setGravity(Gravity.CENTER);
+        v.setFocusable(true);
+        v.setClickable(true);
+        LinearLayout.LayoutParams lp;
+        if (weight > 0) {
+            lp = new LinearLayout.LayoutParams(0, dp(height), weight);
+            lp.rightMargin = dp(5);
+        } else {
+            lp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, dp(height));
+            lp.rightMargin = dp(6);
+            v.setPadding(dp(16), 0, dp(16), 0);
+        }
+        v.setLayoutParams(lp);
+        return v;
+    }
+
+    private void refreshSearchText() {
+        String k = kw.toLowerCase();
+        if (k.length() == 0) {
+            sqText.setText("输入拼音首字母，如 aqy = 爱奇艺");
+            sqText.setTextColor(getResources().getColor(R.color.tx3));
+            sqCount.setText("共 " + all.size() + " 个应用");
+            return;
+        }
+        sqText.setText(kw.toUpperCase());
+        sqText.setTextColor(getResources().getColor(R.color.tx));
+        int n = 0;
+        for (AppEntry a : all) {
+            if (matchSearch(a, k)) n++;
+        }
+        sqCount.setText(n == 0 ? "没找到，换个词试试" : ("匹配 " + n + " 个应用，点「查看结果」"));
+    }
+
+    /** 名称含关键词 / 拼音首字母含关键词 / 简介含中文关键词 */
+    private boolean matchSearch(AppEntry a, String k) {
+        if (a.name.toLowerCase().contains(k)) return true;
+        if (a.py.length() > 0 && a.py.toLowerCase().contains(k)) return true;
+        return k.length() > 0 && !k.matches("[a-z0-9]+") && a.desc.contains(k);
     }
 
     private void doSearch(String q) {

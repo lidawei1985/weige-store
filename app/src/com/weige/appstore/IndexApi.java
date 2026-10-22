@@ -73,10 +73,13 @@ public class IndexApi {
         if (builtinTs > cacheTs) cacheTs = builtinTs;   // 以两者较新的为基线
         final long baseTs = cacheTs;
 
-        if (cached != null && !cached.isEmpty()) {
+        // 先把手头有的立刻显示出来（缓存优先，其次 APK 内置），
+        // 否则首装要等三个网络源全部超时才出画面，用户以为卡死了
+        final List<AppEntry> first = (cached != null && !cached.isEmpty()) ? cached : builtin;
+        if (first != null && !first.isEmpty()) {
             UI.post(new Runnable() {
                 public void run() {
-                    cb.ok(cached, true);
+                    cb.ok(first, true);
                 }
             });
         }

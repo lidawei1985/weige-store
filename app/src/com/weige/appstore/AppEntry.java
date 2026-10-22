@@ -12,6 +12,7 @@ public class AppEntry {
     public String day = "";
     public String iconUrl = "";
     public String apkUrl = "";
+    public String py = "";     // 拼音首字母，遥控器字母搜索用
     public long size = 0;
 
     public static AppEntry from(JSONObject o) {
@@ -26,6 +27,7 @@ public class AppEntry {
         a.size = o.optLong("size");
         a.iconUrl = o.optString("icon");
         a.apkUrl = o.optString("apk");
+        a.py = o.optString("py");
         return a;
     }
 }
