@@ -23,8 +23,10 @@ import time
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
 import source_dangbei as src  # noqa: E402
+import curation  # noqa: E402
 
 DESC_MAX = 110
+BLOCKED = [0]          # 被白名单拦掉的数量（用于日志）
 
 
 def slim(a, cat=""):
@@ -39,7 +41,7 @@ def slim(a, cat=""):
         "name": a.get("name", ""),
         "ver": a.get("ver", ""),
         "size": a.get("size", 0),
-        "cat": cat or a.get("cat", ""),
+        "cat": curation.refine_cat(a.get("name", ""), cat),
         "icon": icon,
         "apk": a.get("apk_url", ""),
         "day": a.get("day", ""),
@@ -48,13 +50,20 @@ def slim(a, cat=""):
 
 
 def merge(bag, a, cat=""):
-    """同一个 id 只保留信息更全的那份。"""
+    """只放行白名单应用；同一个 id 保留信息更全的那份。"""
+    name = a.get("name", "")
+    eff_cat = cat or bag.get(a["id"], {}).get("cat", "") or a.get("cat", "")
+
+    good, _why = curation.is_safe(name, eff_cat if eff_cat in curation.ALLOW_GROUPS else "")
+    if not good:
+        BLOCKED[0] += 1
+        return
+
     cur = bag.get(a["id"])
-    new = slim(a, cat)
+    new = slim(a, eff_cat)
     if cur is None:
         bag[a["id"]] = new
         return
-    # 用新数据覆盖，但空字段保留旧值
     for k, v in new.items():
         if v not in ("", 0, None):
             cur[k] = v
@@ -99,7 +108,10 @@ def build(out_path):
     fresh = len(bag)
     for k, v in old.items():
         if k not in bag:
-            bag[k] = v
+            # 老数据也要过一遍白名单，避免以前混进来的垃圾一直留着
+            good, _ = curation.is_safe(v.get("name", ""), v.get("cat", ""))
+            if good:
+                bag[k] = v
 
     apps = list(bag.values())
     # 有更新日期的排前面，其次按名称
@@ -112,6 +124,8 @@ def build(out_path):
         "updated_text": time.strftime("%Y-%m-%d %H:%M"),
         "count": len(apps),
         "fresh": fresh,
+        "safe_only": True,
+        "blocked": BLOCKED[0],
         "errors": errors,
         "apps": apps,
     }
@@ -123,8 +137,8 @@ def build(out_path):
     os.replace(tmp, out_path)
 
     kb = os.path.getsize(out_path) / 1024.0
-    print("  完成：新增/更新 %d 个，总 %d 个，%.0fKB，用时 %.1fs"
-          % (fresh, len(apps), kb, time.time() - t0))
+    print("  完成：白名单放行 %d 个，拦掉 %d 个不安全/不相关，%.0fKB，用时 %.1fs"
+          % (len(apps), BLOCKED[0], kb, time.time() - t0))
     if errors:
         print("  有 %d 个分类失败（已用上次数据补齐）" % len(errors))
     return data

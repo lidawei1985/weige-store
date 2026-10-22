@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
-    private static final String[] CATS = {"全部", "影音", "工具", "生活", "游戏", "新上架"};
+    private static final String[] CATS = {"精选", "影音", "儿童", "工具", "生活"};
     private static final String[] HOT = {"电视直播", "影视", "投屏", "电视家", "K歌",
             "浏览器", "音乐", "游戏", "网盘", "儿童"};
 
@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
     private final Handler ui = new Handler(Looper.getMainLooper());
 
     private final List<AppEntry> all = new ArrayList<AppEntry>();
-    private String cat = "全部";
+    private String cat = "精选";
     private String mode = "home";
     private String kw = "";
     private boolean loadedOnce = false;
@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
         if (code == KeyEvent.KEYCODE_BACK && "search".equals(mode)) {
             mode = "home";
             kw = "";
-            cat = "全部";
+            cat = "精选";
             buildTabs();
             applyFilter();
             return true;
@@ -114,8 +114,8 @@ public class MainActivity extends Activity {
                     status.setText("本地缓存 · " + all.size() + " 个应用，正在刷新…");
                 } else {
                     String up = IndexApi.updatedText.length() > 0
-                            ? "更新于 " + IndexApi.updatedText : "已就绪";
-                    status.setText(up + " · 共 " + all.size() + " 个应用");
+                            ? " · 更新于 " + IndexApi.updatedText : "";
+                    status.setText("已通过安全筛选 · " + all.size() + " 个正规应用" + up);
                 }
                 applyFilter();
             }
@@ -144,9 +144,7 @@ public class MainActivity extends Activity {
                     }
                 }
             }
-        } else if ("新上架".equals(cat)) {
-            for (int i = 0; i < all.size() && i < 80; i++) out.add(all.get(i));
-        } else if ("全部".equals(cat)) {
+        } else if ("精选".equals(cat)) {
             out.addAll(all);
         } else {
             for (AppEntry a : all) {
@@ -164,7 +162,7 @@ public class MainActivity extends Activity {
             } else if ("search".equals(mode)) {
                 empty.setText("没搜到「" + kw + "」\n按 MENU 换个词，或按 BACK 返回");
             } else {
-                empty.setText("这个分类下暂时没有应用\n按 BACK 或点「全部」");
+                empty.setText("这个分类下暂时没有应用\n按 BACK 或点「精选」");
             }
         } else {
             empty.setVisibility(View.GONE);
@@ -237,13 +235,13 @@ public class MainActivity extends Activity {
         });
         box.addView(r2);
 
-        View r3 = row("返回到「全部」");
+        View r3 = row("返回到「精选」");
         r3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dlg.dismiss();
                 mode = "home";
                 kw = "";
-                cat = "全部";
+                cat = "精选";
                 buildTabs();
                 applyFilter();
             }
@@ -259,7 +257,11 @@ public class MainActivity extends Activity {
         });
         box.addView(r4);
 
-        r1.requestFocus();
+        ui.postDelayed(new Runnable() {
+            public void run() {
+                r1.requestFocus();
+            }
+        }, 300);
     }
 
     private void showIndexDialog() {
@@ -446,7 +448,12 @@ public class MainActivity extends Activity {
             }
         });
         dlg.show();
-        action.requestFocus();
+        // 延迟聚焦：否则遥控器 OK 的 keyup 会落进弹窗按钮，造成「一按直接安装/打开」
+        ui.postDelayed(new Runnable() {
+            public void run() {
+                action.requestFocus();
+            }
+        }, 300);
     }
 
     // ------------------------------------------------------------ 下载安装

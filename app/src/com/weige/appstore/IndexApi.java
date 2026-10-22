@@ -24,17 +24,16 @@ import java.util.List;
  * 换仓库只改 SOURCES。
  */
 public class IndexApi {
-    // ↓↓↓ 换成你自己的 GitHub 用户名/仓库名 ↓↓↓
-    private static final String USER = "USER";
-    private static final String REPO = "REPO";
+    // ↓↓↓ 索引仓库（GitHub Actions 每 6 小时自动更新 site/index.json）↓↓↓
+    private static final String USER = "lidawei1985";
+    private static final String REPO = "weige-store";
 
-    /** 多源容错，按顺序试，谁先通用谁 */
+    /** 多源容错，按顺序试，谁先通用谁（实测 jsDelivr 在国内最稳） */
     private static final String[] DEFAULT_SOURCES = {
             "https://cdn.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/site/index.json",
-            "https://raw.githubusercontent.com/" + USER + "/" + REPO + "/main/site/index.json",
             "https://ghproxy.net/https://raw.githubusercontent.com/" + USER + "/" + REPO
                     + "/main/site/index.json",
-            "https://gitee.com/" + USER + "/" + REPO + "/raw/main/site/index.json",
+            "https://raw.githubusercontent.com/" + USER + "/" + REPO + "/main/site/index.json",
     };
 
     public interface Cb {
