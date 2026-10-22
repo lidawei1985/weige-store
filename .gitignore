@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+data/
+app/build/
+app/*.apk
+server.py
+web/
+启动服务.bat
+*.tmp

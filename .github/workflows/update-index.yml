@@ -1,0 +1,49 @@
+name: 更新应用索引
+
+on:
+  schedule:
+    - cron: "23 */6 * * *"      # 每 6 小时跑一次（UTC）
+  workflow_dispatch:            # 也可以在 Actions 页面手动点一下
+
+permissions:
+  contents: write
+
+concurrency:
+  group: index
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 抓取并生成索引
+        run: python export.py --out site/index.json
+
+      - name: 检查产出
+        run: |
+          test -s site/index.json
+          python - <<'PY'
+          import json
+          d = json.load(open('site/index.json', encoding='utf-8'))
+          print('应用数:', d['count'], '失败分类:', d['errors'])
+          assert d['count'] > 100, '应用数异常偏低，保留旧索引不提交'
+          PY
+
+      - name: 提交
+        run: |
+          git config user.name  "index-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add site/index.json
+          if git diff --cached --quiet; then
+            echo "索引没有变化，跳过提交"
+          else
+            git commit -m "auto: 更新应用索引 $(date -u '+%Y-%m-%d %H:%M')"
+            git push
+          fi
