@@ -287,6 +287,7 @@ public class MainActivity extends Activity {
             for (int i = 0; i < CATS.length; i++) {
                 final int idx = i;
                 TextView t = new TextView(this);
+                t.setId(View.generateViewId());
                 t.setTextSize(14);
                 t.setTextColor(getResources().getColorStateList(R.drawable.tab_text));
                 t.setBackgroundResource(R.drawable.tab_bg);
@@ -318,6 +319,11 @@ public class MainActivity extends Activity {
             boolean on = c.equals(cat) && !"search".equals(mode);
             if ("搜索".equals(c)) on = false;
             t.setSelected(on);
+            // 从网格按「上」要能回到当前分类按钮，否则只能一路按到屏幕外
+            if (on) grid.setNextFocusUpId(t.getId());
+        }
+        if (grid.getNextFocusUpId() == View.NO_ID && tabs.getChildCount() > 0) {
+            grid.setNextFocusUpId(tabs.getChildAt(0).getId());
         }
     }
 
