@@ -7,3 +7,4 @@ server.py
 web/
 启动服务.bat
 *.tmp
+*.idsig
