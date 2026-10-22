@@ -14,3 +14,5 @@ self_apk/
 *.jpg
 *.png
 !self/**/*.png
+self_apk/.seen.json
+self_apk/watcher.log

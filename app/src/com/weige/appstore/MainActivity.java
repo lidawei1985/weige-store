@@ -77,6 +77,11 @@ public class MainActivity extends Activity {
         ImageLoader.init(this);
         adapter = new AppAdapter(this);
         grid.setAdapter(adapter);
+        // 干净第一：加载中、共多少个、缓存状态这些字一律不显示
+        View footer = findViewById(R.id.footer);
+        if (footer != null) footer.setVisibility(View.GONE);
+        countTv.setVisibility(View.GONE);
+
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> p, View v, int pos, long id) {
                 showDetail(adapter.getItem(pos));
@@ -146,15 +151,12 @@ public class MainActivity extends Activity {
     private void refresh() {
         empty.setVisibility(View.VISIBLE);
         empty.setText(R.string.loading);
-        status.setText("正在读取索引…");
         IndexApi.load(this, new IndexApi.Cb() {
             public void ok(List<AppEntry> apps, boolean fromCache) {
                 boolean first = !loadedOnce;
                 all.clear();
                 all.addAll(apps);
                 loadedOnce = true;
-                status.setText(fromCache ? ("本地缓存 · " + all.size() + " 个应用，正在刷新…")
-                        : buildStatus());
                 buildTabs();
                 applyFilter(first);
             }
@@ -821,7 +823,7 @@ public class MainActivity extends Activity {
             ImageView iv = new ImageView(this);
             iv.setLayoutParams(new LinearLayout.LayoutParams(dp(56), dp(56)));
             iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            ImageLoader.load(e.iconUrl, iv);
+            ImageLoader.load(e.iconUrl, e.iconUrl2, iv);
             card.addView(iv);
 
             TextView nm = new TextView(this);
@@ -872,7 +874,7 @@ public class MainActivity extends Activity {
         if (e.day.length() > 0) sb.append(" · ").append(e.day);
         meta.setText(sb.toString());
         desc.setText(e.desc.length() > 0 ? e.desc : "（这个应用没有简介）");
-        ImageLoader.load(e.iconUrl, ic);
+        ImageLoader.load(e.iconUrl, e.iconUrl2, ic);
 
         final String inst = PkgUtil.installedVerOf(this, e);
         boolean canOpen = false;

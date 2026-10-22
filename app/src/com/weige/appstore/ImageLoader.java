@@ -39,6 +39,10 @@ public class ImageLoader {
     }
 
     public static void load(final String url, final ImageView iv) {
+        load(url, null, iv);
+    }
+
+    public static void load(final String url, final String fallbackUrl, final ImageView iv) {
         if (url == null || url.length() == 0) {
             iv.setImageResource(R.drawable.ic_placeholder);
             return;
@@ -98,8 +102,10 @@ public class ImageLoader {
                 } catch (Exception e) {
                     // 网络失败：先试 APK 内置的同名图标，再保持占位
                     final String name = url.substring(url.lastIndexOf('/') + 1);
-                    if (!loadAssetQuiet("self_icon/" + name, iv, key)) {
-                        // 保留占位图
+                    if (!loadAssetQuiet("self_icon/" + name, iv, key)
+                            && fallbackUrl != null && fallbackUrl.length() > 0
+                            && !fallbackUrl.equals(url)) {
+                        load(fallbackUrl, iv);
                     }
                 } finally {
                     if (c != null) c.disconnect();
@@ -135,9 +141,7 @@ public class ImageLoader {
             return;
         }
         iv.setImageResource(R.drawable.ic_placeholder);
-        if (!loadAssetQuiet(path, iv, key)) {
-            iv.setImageResource(R.drawable.ic_placeholder);
-        }
+        loadAssetQuiet(path, iv, key);
     }
 
     private static String md5(String s) {

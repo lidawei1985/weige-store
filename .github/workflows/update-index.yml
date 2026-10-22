@@ -34,6 +34,14 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: 装图标库
+        run: pip install pillow
+
+      # self_apk/ 是"进货口"：网页上传新 APK 到这里就行，
+      # 这一步自动解析包名版本、抽图标、和老版本比 versionCode
+      - name: 收录自研应用
+        run: python self_apps.py scan
+
       - name: 抓取并生成索引
         run: python export.py --out site/index.json
 
@@ -54,7 +62,8 @@ jobs:
         run: |
           git config user.name  "index-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add site/index.json
+          git add site/index.json self
+          git add app/assets/self_icon 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "索引没有变化，跳过提交"
           else

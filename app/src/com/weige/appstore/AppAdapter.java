@@ -70,7 +70,7 @@ public class AppAdapter extends BaseAdapter {
             meta.setTextColor(0xFF8B97A8);
         }
 
-        ImageLoader.load(e.iconUrl, icon);
+        ImageLoader.load(e.iconUrl, e.iconUrl2, icon);
 
         boolean focused = v.isFocused();
         v.setScaleX(focused ? 1.05f : 1f);

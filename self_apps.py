@@ -115,7 +115,10 @@ def _fallback_icon(apk_path, out_png, name):
         d.rounded_rectangle([0, 0, S - 1, S - 1], radius=int(S * 0.23),
                             fill=(59, 130, 246, 255))
         ch = (name or "伟")[0]
-        f = ImageFont.truetype("C:/Windows/Fonts/msyhbd.ttc", int(S * 0.5))
+        try:
+            f = ImageFont.truetype("C:/Windows/Fonts/msyhbd.ttc", int(S * 0.5))
+        except Exception:
+            f = ImageFont.load_default()
         bb = d.textbbox((0, 0), ch, font=f)
         d.text(((S - (bb[2] - bb[0])) / 2 - bb[0], (S - (bb[3] - bb[1])) / 2 - bb[1]),
                ch, font=f, fill=(255, 255, 255, 255))
@@ -179,13 +182,19 @@ def add(apk_path, verbose=True):
     dst_apk = os.path.join(APK_DIR, slug + ".apk")
     shutil.copyfile(apk_path, dst_apk)
     dst_icon = os.path.join(ICON_DIR, slug + ".png")
-    has_icon = os.path.exists(icon_tmp)
-    if has_icon:
-        shutil.move(icon_tmp, dst_icon)
+    # 设计稿优先：self/design/<slug>.png 是人工放的高清图，永远盖过 APK 里抽的
+    design = os.path.join(SELF_DIR, "design", slug + ".png")
+    if os.path.exists(design):
+        shutil.copyfile(design, dst_icon)
+        has_icon = True
     else:
-        # apkmeta 合不出（adaptive icon 被混淆过），自己再找一遍
-        has_icon = (os.path.exists(dst_icon)
-                    or _fallback_icon(apk_path, dst_icon, info.get("name") or slug))
+        has_icon = os.path.exists(icon_tmp)
+        if has_icon:
+            shutil.move(icon_tmp, dst_icon)
+        else:
+            # apkmeta 合不出（adaptive icon 被混淆过），自己再找一遍
+            has_icon = (os.path.exists(dst_icon)
+                        or _fallback_icon(apk_path, dst_icon, info.get("name") or slug))
 
     entry = {
         "pkg": pkg,
@@ -230,9 +239,12 @@ def collect():
             continue
         # 图标直接引用 APK 内置的那份（客户端支持 asset: 前缀），
         # 不依赖 CDN，装到没网的电视上也有图
-        icon = ""
-        if a.get("icon") and os.path.exists(os.path.join(ICON_DIR, slug + ".png")):
+        icon = icon2 = ""
+        if a.get("icon") and (os.path.exists(os.path.join(ICON_DIR, slug + ".png"))
+                              or os.path.exists(os.path.join(SELF_DIR, "design", slug + ".png"))):
+            # 主用 APK 内置图标（秒出、离线可用）；老客户端没有内置的就走 CDN 兜底
             icon = "asset:self_icon/%s.png" % slug
+            icon2 = CDN + "icon/%s.png" % slug
         out.append({
             "id": "self:" + slug,
             "name": a.get("name", ""),
@@ -240,6 +252,7 @@ def collect():
             "size": a.get("size", 0),
             "cat": a.get("cat", "工具"),
             "icon": icon,
+            "icon2": icon2,
             "apk": ext if ext else (CDN + rel_apk),
             "apk2": (MIRROR + ext) if ext else (MIRROR + rel_apk),
             "pkg": a.get("pkg", ""),
