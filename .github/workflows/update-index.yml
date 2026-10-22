@@ -32,8 +32,11 @@ jobs:
           python - <<'PY'
           import json
           d = json.load(open('site/index.json', encoding='utf-8'))
-          print('应用数:', d['count'], '失败分类:', d['errors'])
-          assert d['count'] > 50, '应用数异常偏低，保留旧索引不提交'
+          print('应用数:', d['count'], '拦掉:', d.get('blocked'), '失败:', d['errors'])
+          assert d.get('safe_only') is True, '索引必须标记 safe_only'
+          # 现在白名单能放行 250+，低于 200 说明抓取大面积失败，宁可保留旧索引
+          assert d['count'] > 200, '应用数异常偏低，保留旧索引不提交'
+          assert len(d['errors']) < 8, '失败分类过多，保留旧索引不提交'
           PY
 
       - name: 提交
