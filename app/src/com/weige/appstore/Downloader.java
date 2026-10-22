@@ -95,6 +95,7 @@ public class Downloader {
                         }
                     });
                 } catch (final Exception e) {
+                    android.util.Log.e("WeigeStore", "download fail: " + url + " => " + e);
                     UI.post(new Runnable() {
                         public void run() {
                             cb.fail(String.valueOf(e.getMessage()));

@@ -34,7 +34,8 @@ MANIFEST = os.path.join(SELF_DIR, "apps.json")
 
 # 公网直链：jsDelivr 为主，ghproxy 兜底（客户端下载失败会自动换）
 CDN = "https://cdn.jsdelivr.net/gh/lidawei1985/weige-store@main/self/"
-MIRROR = "https://ghproxy.net/https://raw.githubusercontent.com/lidawei1985/weige-store/main/self/"
+GH_PROXY = "https://ghproxy.net/"   # 任意 github 直链前缀
+RAW = "https://raw.githubusercontent.com/lidawei1985/weige-store/main/self/"
 
 # 包名 -> (文件名, 分类, 简介)。没收录的包名会自动用包名当文件名。
 KNOWN = {
@@ -260,6 +261,11 @@ def collect():
             # 主用 APK 内置图标（秒出、离线可用）；老客户端没有内置的就走 CDN 兜底
             icon = "asset:self_icon/%s.png" % slug
             icon2 = CDN + "icon/%s.png" % slug
+        # 主源用 ghproxy（国内直连可用，jsDelivr 经常被墙）；jsDelivr 只做备用
+        if ext:
+            apk_url, apk2_url = ext, GH_PROXY + ext
+        else:
+            apk_url, apk2_url = GH_PROXY + RAW + rel_apk, CDN + rel_apk
         out.append({
             "id": "self:" + slug,
             "name": a.get("name", ""),
@@ -268,8 +274,8 @@ def collect():
             "cat": a.get("cat", "工具"),
             "icon": icon,
             "icon2": icon2,
-            "apk": ext if ext else (CDN + rel_apk),
-            "apk2": (MIRROR + ext) if ext else (MIRROR + rel_apk),
+            "apk": apk_url,
+            "apk2": apk2_url,
             "pkg": a.get("pkg", ""),
             "day": a.get("day", ""),
             "desc": a.get("desc", ""),

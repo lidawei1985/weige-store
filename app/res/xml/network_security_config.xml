@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 老 Android（7.0/5.x/6.x）系统证书库没有 Let's Encrypt 的 ISRG 根证书，
+     ghproxy / 当贝CDN 等全是 LE 证书，握手会直接失败。
+     这里把 ISRG Root X1/X2 打进 APK，系统证书 + 自带证书一起信任。 -->
+<network-security-config>
+    <base-config>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/isrg_root_x1" />
+            <certificates src="@raw/isrg_root_x2" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
