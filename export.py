@@ -24,6 +24,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
 import source_dangbei as src  # noqa: E402
 import curation  # noqa: E402
+import pinyin  # noqa: E402
 
 DESC_MAX = 110
 BLOCKED = [0]          # 被白名单拦掉的数量（用于日志）
@@ -62,6 +63,8 @@ def slim(a, cat=""):
         "apk": a.get("apk_url", ""),
         "day": a.get("day", ""),
         "desc": d,
+        # 拼音首字母，电视上用字母键盘搜中文靠它
+        "py": pinyin.initials(a.get("name", "")),
     }
 
 
