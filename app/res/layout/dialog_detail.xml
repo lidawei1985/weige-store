@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 小卡片就够：图标 + 名称 + 版本/大小 + 两行简介 + 按钮 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="540dp"
+    android:layout_width="420dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/dialog_bg"
-    android:padding="26dp">
+    android:padding="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,8 +15,8 @@
 
         <ImageView
             android:id="@+id/dicon"
-            android:layout_width="92dp"
-            android:layout_height="92dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_placeholder" />
 
@@ -23,7 +24,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginLeft="18dp"
+            android:layout_marginLeft="14dp"
             android:orientation="vertical">
 
             <TextView
@@ -33,23 +34,24 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textColor="@color/tx"
-                android:textSize="20sp" />
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/dmeta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
                 android:textColor="@color/tx2"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/dstate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
                 android:textColor="@color/accent"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -57,17 +59,17 @@
         android:id="@+id/ddesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:lineSpacingExtra="5dp"
-        android:maxLines="4"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="3dp"
+        android:maxLines="2"
         android:ellipsize="end"
         android:textColor="@color/tx2"
-        android:textSize="13sp" />
+        android:textSize="11sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="14dp"
         android:orientation="horizontal"
         android:gravity="right|center_vertical">
 
@@ -76,30 +78,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_ghost"
-            android:paddingLeft="26dp"
-            android:paddingRight="26dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
+            android:paddingLeft="22dp"
+            android:paddingRight="22dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:focusable="true"
             android:clickable="true"
             android:text="关闭"
             android:textColor="@color/tx2"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/btn_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
+            android:layout_marginLeft="10dp"
             android:background="@drawable/btn_primary"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
+            android:paddingLeft="28dp"
+            android:paddingRight="28dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:focusable="true"
             android:clickable="true"
             android:text="安装"
             android:textColor="#FFFFFFFF"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>

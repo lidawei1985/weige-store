@@ -25,6 +25,7 @@ sys.path.insert(0, BASE_DIR)
 import source_dangbei as src  # noqa: E402
 import curation  # noqa: E402
 import pinyin  # noqa: E402
+import self_apps  # noqa: E402
 
 DESC_MAX = 110
 BLOCKED = [0]          # 被白名单拦掉的数量（用于日志）
@@ -149,8 +150,16 @@ def build(out_path):
                 bag[k] = v
 
     apps = list(bag.values())
+    # 自研应用（伟哥投屏/直播、星幕、心屋…）单独收，不走当贝白名单，
+    # 而且永远排在最前面 —— 自己家的东西要一眼看到
+    mine = self_apps.collect()
+    for a in mine:
+        bag.pop(a["id"], None)
+    apps = [a for a in apps if not a.get("self")]
+
     # 有更新日期的排前面，其次按名称
     apps.sort(key=lambda x: (x.get("day") or "", x.get("name") or ""), reverse=True)
+    apps = mine + apps
 
     data = {
         "v": 1,

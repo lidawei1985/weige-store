@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">伟哥应用商店</string>
+    <string name="app_name">伟哥商店</string>
     <string name="search_hint">输入应用名</string>
     <string name="loading">正在加载…</string>
     <string name="empty">还没有数据\n按 MENU 键可重试或换服务器</string>

@@ -58,6 +58,10 @@ public class AppAdapter extends BaseAdapter {
                 meta.setText("已安装 " + inst);
                 meta.setTextColor(0xFF6FCF97);
             }
+        } else if (e.isSelf) {
+            // 自己家的应用单独标出来，一眼能认
+            meta.setText("自研 · " + (e.ver.length() > 0 ? e.ver + " · " : "") + fmt(e.size));
+            meta.setTextColor(0xFF5B9BFF);
         } else if (e.ver.length() > 0) {
             meta.setText(e.ver + " · " + fmt(e.size));
             meta.setTextColor(0xFF8B97A8);

@@ -28,16 +28,22 @@ public class PkgUtil {
 
     private static Map<String, String> installedByName;   // 归一化名 -> 包名
     private static Map<String, String> installedPkgLabel; // 包名 -> 原始 label
+    // 版本号缓存：列表页会同时判断 250+ 个应用，每次都问 PackageManager 会很卡
+    private static final Map<String, String> verCache = new HashMap<String, String>();
 
     /** 已装返回版本名，未装返回 null */
     public static String installedVer(Context c, String pkg) {
         if (pkg == null || pkg.length() == 0) return null;
+        if (verCache.containsKey(pkg)) return verCache.get(pkg);
+        String v;
         try {
             PackageInfo pi = c.getPackageManager().getPackageInfo(pkg, 0);
-            return pi.versionName == null ? "" : pi.versionName;
+            v = pi.versionName == null ? "" : pi.versionName;
         } catch (Exception e) {
-            return null;
+            v = null;
         }
+        verCache.put(pkg, v);
+        return v;
     }
 
     public static void openApp(Context c, String pkg) {
@@ -145,6 +151,7 @@ public class PkgUtil {
     public static synchronized void invalidate() {
         installedByName = null;
         installedPkgLabel = null;
+        verCache.clear();
     }
 
     /** 已安装应用总数（用于「我的」页标题） */
