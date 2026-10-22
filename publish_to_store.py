@@ -65,9 +65,8 @@ def newest_apk():
 
 
 def git(args):
-    env = list(args)
-    return subprocess.call(["git", "-c", "http.https://github.com.proxy="] + env,
-                           cwd=STORE_DIR)
+    # remote 已配 SSH over 443（github-store），HTTPS 直连 github.com 不稳
+    return subprocess.call(["git"] + list(args), cwd=STORE_DIR)
 
 
 def main():

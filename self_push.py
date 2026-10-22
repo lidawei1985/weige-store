@@ -117,11 +117,11 @@ def main():
     subprocess.call(["git", "commit", "-m", "auto: 自研应用上架 " +
                      __import__("time").strftime("%Y-%m-%d %H:%M")], cwd=BASE_DIR)
 
-    env_proxy = ["-c", "http.https://github.com.proxy="]
+    # remote 已配 SSH over 443（github-store），无需代理参数
     for i in range(6):
-        subprocess.call(["git"] + env_proxy + ["pull", "--no-rebase", "-X", "theirs",
-                                               "origin", "main"], cwd=BASE_DIR)
-        r = subprocess.call(["git"] + env_proxy + ["push", "origin", "main"], cwd=BASE_DIR)
+        subprocess.call(["git", "pull", "--no-rebase", "-X", "theirs",
+                         "origin", "main"], cwd=BASE_DIR)
+        r = subprocess.call(["git", "push", "origin", "main"], cwd=BASE_DIR)
         if r == 0:
             print("已推送到 GitHub，CI 会在几分钟内重建线上索引，电视端打开商店即可看到更新")
             return 0
