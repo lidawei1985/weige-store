@@ -882,7 +882,8 @@ public class MainActivity extends Activity {
         String actionTxt = getString(R.string.install);
 
         if (inst != null) {
-            if (e.ver.length() > 0 && !e.ver.equals(inst)) {
+            int instCode = PkgUtil.installedCode(this, PkgUtil.resolvePkg(this, e));
+            if (e.ver.length() > 0 && PkgUtil.hasUpdate(e.ver, e.verCode, inst, instCode)) {
                 stateTxt = "已装 " + inst + "，可升到 " + e.ver;
                 actionTxt = getString(R.string.update);
             } else {
