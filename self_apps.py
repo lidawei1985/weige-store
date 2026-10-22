@@ -270,6 +270,7 @@ def collect():
             "id": "self:" + slug,
             "name": a.get("name", ""),
             "ver": a.get("ver", ""),
+            "code": a.get("code", 0),
             "size": a.get("size", 0),
             "cat": a.get("cat", "工具"),
             "icon": icon,

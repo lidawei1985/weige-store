@@ -78,6 +78,19 @@
       "day": "2026-10-22",
       "order": 5,
       "icon": true
+    },
+    {
+      "pkg": "com.weige.appstore",
+      "slug": "weige-store",
+      "name": "伟哥商店",
+      "ver": "1.4",
+      "code": 5,
+      "size": 3804298,
+      "cat": "工具",
+      "desc": "伟哥应用商店自己，换电视时用它把其它应用装回来",
+      "day": "2026-10-22",
+      "order": 6,
+      "icon": true
     }
   ]
 }
