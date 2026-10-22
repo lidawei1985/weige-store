@@ -163,19 +163,34 @@ def add(apk_path, verbose=True):
     if cur is not None:
         old_code = int(cur.get("code") or 0)
         same_ver = (cur.get("ver") == ver)
-        if old_code > 0 and code > 0:
-            if code < old_code:
-                if verbose:
-                    print("  %-12s 已有更新版本 %s，本次 %s 更旧，跳过"
-                          % (info.get("name", pkg), cur.get("ver"), ver))
-                return "skip"
-            if code == old_code and same_ver:
-                if verbose:
-                    print("  %-12s %s 已是最新，跳过" % (info.get("name", pkg), ver))
-                return "skip"
-        elif same_ver:
+        # 版本名逐段数字比较（0.2.2.20261022_1808 > 0.2.2.20261022_1708）
+        def _vkey(s):
+            parts = []
+            for p in (s or "").split("."):
+                p = p.strip()
+                if p.isdigit():
+                    parts.append((1, int(p), ""))
+                else:
+                    parts.append((0, 0, p))
+            return tuple(parts)
+        newer = False
+        if old_code > 0 and code > 0 and code != old_code:
+            newer = code > old_code
+        elif old_code == code:
+            newer = _vkey(ver) > _vkey(cur.get("ver"))
+        # 版本号没变但文件内容变了（同版本重新打包）→ 也算要更新
+        if not newer and same_ver:
+            dst_cur = os.path.join(APK_DIR, slug + ".apk")
+            if os.path.exists(dst_cur):
+                import hashlib
+                h_new = hashlib.md5(open(apk_path, "rb").read()).hexdigest()
+                h_old = hashlib.md5(open(dst_cur, "rb").read()).hexdigest()
+                if h_new != h_old:
+                    newer = True
+        if cur.get("ver") and not newer:
             if verbose:
-                print("  %-12s %s 已是最新，跳过" % (info.get("name", pkg), ver))
+                print("  %-12s 已有更新版本 %s，本次 %s 更旧，跳过"
+                      % (info.get("name", pkg), cur.get("ver"), ver))
             return "skip"
 
     # 落盘

@@ -46,6 +46,61 @@ public class PkgUtil {
         return v;
     }
 
+    private static final Map<String, Integer> codeCache = new HashMap<String, Integer>();
+
+    /** 已装返回 versionCode，未装返回 0 */
+    public static int installedCode(Context c, String pkg) {
+        if (pkg == null || pkg.length() == 0) return 0;
+        Integer hit = codeCache.get(pkg);
+        if (hit != null) return hit.intValue();
+        int code;
+        try {
+            PackageInfo pi = c.getPackageManager().getPackageInfo(pkg, 0);
+            code = pi.versionCode;
+        } catch (Exception e) {
+            code = 0;
+        }
+        codeCache.put(pkg, Integer.valueOf(code));
+        return code;
+    }
+
+    /**
+     * 索引版本是否比已装版本新。
+     * 优先比 versionCode；自研应用 versionCode 一直是 1 时退回版本名字符串逐段比较
+     * （如 0.2.2.20261022_1808 > 0.2.2.20261022_1708）。
+     */
+    public static boolean hasUpdate(String idxVer, int idxCode, String instVer, int instCode) {
+        if (idxCode > 0 && instCode > 0 && idxCode != instCode) return idxCode > instCode;
+        if (idxVer == null || instVer == null) return false;
+        if (idxVer.equals(instVer)) return false;
+        return cmpVer(idxVer, instVer) > 0;
+    }
+
+    /** 逐段数字比较版本名，前缀段不同的按数字比，其余退回字符串比 */
+    static int cmpVer(String a, String b) {
+        String[] pa = a.split("\\.");
+        String[] pb = b.split("\\.");
+        int n = Math.min(pa.length, pb.length);
+        for (int i = 0; i < n; i++) {
+            String sa = pa[i], sb = pb[i];
+            Integer ia = num(sa), ib = num(sb);
+            if (ia != null && ib != null && !ia.equals(ib)) {
+                return ia.intValue() > ib.intValue() ? 1 : -1;
+            }
+            int c = sa.compareTo(sb);
+            if (c != 0) return c;
+        }
+        return pa.length - pb.length;
+    }
+
+    private static Integer num(String s) {
+        try {
+            return s.matches("\\d+") ? Integer.valueOf(s) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static void openApp(Context c, String pkg) {
         Intent i = c.getPackageManager().getLaunchIntentForPackage(pkg);
         if (i != null) {
@@ -152,6 +207,7 @@ public class PkgUtil {
         installedByName = null;
         installedPkgLabel = null;
         verCache.clear();
+        codeCache.clear();
     }
 
     /** 已安装应用总数（用于「我的」页标题） */

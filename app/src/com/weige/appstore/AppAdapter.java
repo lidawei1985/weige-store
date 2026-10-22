@@ -51,7 +51,8 @@ public class AppAdapter extends BaseAdapter {
 
         String inst = PkgUtil.installedVerOf(ctx, e);
         if (inst != null) {
-            if (e.ver.length() > 0 && !e.ver.equals(inst)) {
+            int instCode = PkgUtil.installedCode(ctx, PkgUtil.resolvePkg(ctx, e));
+            if (e.ver.length() > 0 && PkgUtil.hasUpdate(e.ver, e.verCode, inst, instCode)) {
                 meta.setText("可更新 " + inst + " → " + e.ver);
                 meta.setTextColor(0xFFFFB020);
             } else {

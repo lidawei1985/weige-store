@@ -1,25 +1,12 @@
 {
   "apps": [
     {
-      "pkg": "com.weige.fresh",
-      "slug": "weige-fresh",
-      "name": "伟哥保鲜",
-      "ver": "1.0",
-      "code": 1,
-      "size": 66741,
-      "cat": "工具",
-      "desc": "伟哥保鲜，占位小工具",
-      "day": "2026-10-22",
-      "order": 0,
-      "icon": true
-    },
-    {
       "pkg": "com.weige.live",
       "slug": "weige-live",
       "name": "伟哥直播",
-      "ver": "0.2.2.20261022_1708",
+      "ver": "0.2.2.20261022_1808",
       "code": 1,
-      "size": 6983368,
+      "size": 6980724,
       "cat": "影音",
       "desc": "自己家的电视直播，频道自己维护，没有广告和购物台",
       "day": "2026-10-22",
@@ -78,6 +65,19 @@
       "order": 5,
       "icon": true,
       "url": "https://github.com/lidawei1985/weige-store/releases/download/self-desktop/xingmu-desktop.apk"
+    },
+    {
+      "pkg": "com.weige.fresh",
+      "slug": "weige-fresh",
+      "name": "伟哥保鲜",
+      "ver": "1.0",
+      "code": 1,
+      "size": 68620,
+      "cat": "工具",
+      "desc": "伟哥保鲜，占位小工具",
+      "day": "2026-10-22",
+      "order": 5,
+      "icon": true
     }
   ]
 }

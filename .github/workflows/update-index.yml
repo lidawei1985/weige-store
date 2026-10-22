@@ -68,5 +68,6 @@ jobs:
             echo "索引没有变化，跳过提交"
           else
             git commit -m "auto: 更新应用索引 $(date -u '+%Y-%m-%d %H:%M')"
-            git push
+            # 远端可能在这几分钟里又有新提交（比如刚推送过代码），先合再推
+            git pull --no-rebase -X theirs origin main && git push
           fi

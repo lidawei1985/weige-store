@@ -15,6 +15,7 @@ public class AppEntry {
     public String apkUrl = "";
     public String apkUrl2 = "";   // 备用下载源（自研应用走 CDN + 镜像两条）
     public boolean isSelf = false; // 自研应用，界面上单独标
+    public int verCode = 0;    // versionCode，自研应用带，用于精准判断更新
     public String py = "";     // 拼音首字母，遥控器字母搜索用
     public long size = 0;
 
@@ -33,6 +34,7 @@ public class AppEntry {
         a.apkUrl = o.optString("apk");
         a.apkUrl2 = o.optString("apk2");
         a.isSelf = o.optBoolean("self");
+        a.verCode = o.optInt("code", 0);
         a.py = o.optString("py");
         return a;
     }
