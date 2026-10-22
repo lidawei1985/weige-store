@@ -23,6 +23,12 @@ SELF_APK = os.path.join(BASE_DIR, "self_apk")
 # 已知自研 APP 的构建产物目录（按包名 -> 候选目录列表，取里面最新的 apk）
 # 新建了自研 APP 工程就到这里加一行
 KNOWN_DIRS = {
+    "com.zhuiyi.tv": [
+        r"F:\AI_WORKSPACE\WorkBuddy\workspace\2026-08-31-18-44-00\zhuiyi-tv-apk",
+    ],
+    "com.yinghuo.tv": [
+        r"F:\AI_WORKSPACE\WorkBuddy\workspace\2026-08-31-18-44-00\yinghuo-tv-apk",
+    ],
     "com.weige.live": [
         r"F:\2026-10-22-14-36-54",
         r"F:\2026-10-22-14-36-54\weige-live\app\build\outputs\apk\release",
