@@ -222,12 +222,17 @@ def collect():
     out = []
     for a in data.get("apps", []):
         slug = a["slug"]
+        # 大文件（超过 git 100MB 限制的，比如星幕桌面 152MB）走 Release，
+        # 条目里带 url；小文件直接放仓库走 CDN
+        ext = a.get("url", "")
         rel_apk = "apk/%s.apk" % slug
-        if not os.path.exists(os.path.join(SELF_DIR, rel_apk)):
+        if not ext and not os.path.exists(os.path.join(SELF_DIR, rel_apk)):
             continue
+        # 图标直接引用 APK 内置的那份（客户端支持 asset: 前缀），
+        # 不依赖 CDN，装到没网的电视上也有图
         icon = ""
         if a.get("icon") and os.path.exists(os.path.join(ICON_DIR, slug + ".png")):
-            icon = CDN + "icon/%s.png" % slug
+            icon = "asset:self_icon/%s.png" % slug
         out.append({
             "id": "self:" + slug,
             "name": a.get("name", ""),
@@ -235,8 +240,8 @@ def collect():
             "size": a.get("size", 0),
             "cat": a.get("cat", "工具"),
             "icon": icon,
-            "apk": CDN + rel_apk,
-            "apk2": MIRROR + rel_apk,
+            "apk": ext if ext else (CDN + rel_apk),
+            "apk2": (MIRROR + ext) if ext else (MIRROR + rel_apk),
             "pkg": a.get("pkg", ""),
             "day": a.get("day", ""),
             "desc": a.get("desc", ""),

@@ -22,8 +22,10 @@ public class ImageLoader {
     private static final ExecutorService POOL = Executors.newFixedThreadPool(4);
     private static final Handler UI = new Handler(Looper.getMainLooper());
     private static File dir;
+    private static Context app;
 
     public static void init(Context c) {
+        app = c.getApplicationContext();
         dir = new File(c.getCacheDir(), "icons");
         if (!dir.exists() && !dir.mkdirs()) {
             dir = c.getCacheDir();
@@ -39,6 +41,11 @@ public class ImageLoader {
     public static void load(final String url, final ImageView iv) {
         if (url == null || url.length() == 0) {
             iv.setImageResource(R.drawable.ic_placeholder);
+            return;
+        }
+        // 自研应用的图标直接打包在 APK 里，不走网络，永远有图
+        if (url.startsWith("asset:")) {
+            loadAsset(url.substring(6), iv);
             return;
         }
         final String key = md5(url);
@@ -89,12 +96,48 @@ public class ImageLoader {
                         tmp.delete();
                     }
                 } catch (Exception e) {
-                    // 静默失败，保留占位图
+                    // 网络失败：先试 APK 内置的同名图标，再保持占位
+                    final String name = url.substring(url.lastIndexOf('/') + 1);
+                    if (!loadAssetQuiet("self_icon/" + name, iv, key)) {
+                        // 保留占位图
+                    }
                 } finally {
                     if (c != null) c.disconnect();
                 }
             }
         });
+    }
+
+    /** 从 APK 的 assets 里读图标 */
+    private static boolean loadAssetQuiet(String path, ImageView iv, String key) {
+        try {
+            InputStream in = app.getAssets().open(path);
+            final Bitmap bm = BitmapFactory.decodeStream(in);
+            in.close();
+            if (bm == null) return false;
+            mem.put(key, bm);
+            UI.post(new Runnable() {
+                public void run() {
+                    if (key.equals(iv.getTag())) iv.setImageBitmap(bm);
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static void loadAsset(final String path, ImageView iv) {
+        final String key = "asset:" + path;
+        Bitmap b = mem.get(key);
+        if (b != null) {
+            iv.setImageBitmap(b);
+            return;
+        }
+        iv.setImageResource(R.drawable.ic_placeholder);
+        if (!loadAssetQuiet(path, iv, key)) {
+            iv.setImageResource(R.drawable.ic_placeholder);
+        }
     }
 
     private static String md5(String s) {
