@@ -31,9 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
-    private static final String[] CATS = {"精选", "影音", "儿童", "工具", "生活"};
+    /** 顶部标签；「搜索」不是分类，点了直接弹搜索框 */
+    private static final String[] CATS = {"精选", "我的", "影音", "儿童", "工具", "生活", "搜索"};
     private static final String[] HOT = {"电视直播", "影视", "投屏", "电视家", "K歌",
-            "浏览器", "音乐", "游戏", "网盘", "儿童"};
+            "浏览器", "音乐", "网盘", "儿童", "教育"};
 
     private GridView grid;
     private TextView empty, status, countTv, dlText, dlPct;
@@ -44,9 +45,15 @@ public class MainActivity extends Activity {
 
     private final List<AppEntry> all = new ArrayList<AppEntry>();
     private String cat = "精选";
-    private String mode = "home";
+    private String mode = "home";     // home / mine / search
     private String kw = "";
     private boolean loadedOnce = false;
+    private boolean sortByName = false;
+
+    // 批量更新队列
+    private final List<AppEntry> queue = new ArrayList<AppEntry>();
+    private boolean waitingInstall = false;
+    private int updDone = 0, updTotal = 0;
 
     // ------------------------------------------------------------ 生命周期
     @Override
@@ -73,6 +80,19 @@ public class MainActivity extends Activity {
             }
         });
 
+        // 已安装清单扫一遍（1~2 秒），用于识别「已安装 / 可更新」
+        new Thread(new Runnable() {
+            public void run() {
+                PkgUtil.scanInstalled(MainActivity.this);
+                ui.post(new Runnable() {
+                    public void run() {
+                        buildTabs();
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+
         buildTabs();
         refresh();
     }
@@ -80,7 +100,16 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        PkgUtil.invalidate();
         if (adapter != null) adapter.notifyDataSetChanged();
+        if (waitingInstall) {
+            waitingInstall = false;
+            ui.postDelayed(new Runnable() {
+                public void run() {
+                    nextInQueue();
+                }
+            }, 1200);
+        }
     }
 
     @Override
@@ -89,7 +118,11 @@ public class MainActivity extends Activity {
             showMenu();
             return true;
         }
-        if (code == KeyEvent.KEYCODE_BACK && "search".equals(mode)) {
+        if (code == KeyEvent.KEYCODE_SEARCH) {
+            showSearch();
+            return true;
+        }
+        if (code == KeyEvent.KEYCODE_BACK && !"home".equals(mode)) {
             mode = "home";
             kw = "";
             cat = "精选";
@@ -113,10 +146,9 @@ public class MainActivity extends Activity {
                 if (fromCache) {
                     status.setText("本地缓存 · " + all.size() + " 个应用，正在刷新…");
                 } else {
-                    String up = IndexApi.updatedText.length() > 0
-                            ? " · 更新于 " + IndexApi.updatedText : "";
-                    status.setText("已通过安全筛选 · " + all.size() + " 个正规应用" + up);
+                    status.setText(buildStatus());
                 }
+                buildTabs();
                 applyFilter();
             }
 
@@ -130,6 +162,25 @@ public class MainActivity extends Activity {
         });
     }
 
+    private String buildStatus() {
+        String up = IndexApi.updatedText.length() > 0
+                ? " · 更新于 " + IndexApi.updatedText : "";
+        int upd = countUpdatable();
+        String s = "已通过安全筛选 · " + all.size() + " 个正规应用" + up;
+        if (upd > 0) s += " · " + upd + " 个可更新";
+        return s;
+    }
+
+    /** 索引里「已安装且有新版本」的数量 */
+    private int countUpdatable() {
+        int n = 0;
+        for (AppEntry a : all) {
+            String inst = PkgUtil.installedVerOf(this, a);
+            if (inst != null && a.ver.length() > 0 && !a.ver.equals(inst)) n++;
+        }
+        return n;
+    }
+
     // ------------------------------------------------------------ 筛选
     private void applyFilter() {
         List<AppEntry> out = new ArrayList<AppEntry>();
@@ -137,19 +188,45 @@ public class MainActivity extends Activity {
             if (kw.length() == 0) {
                 out.addAll(all);
             } else {
+                String k = kw.toLowerCase();
+                // 先精确前缀，再包含，命中的排前面
+                List<AppEntry> front = new ArrayList<AppEntry>();
                 for (AppEntry a : all) {
-                    if (a.name.contains(kw) || a.desc.contains(kw)
-                            || a.name.toLowerCase().contains(kw.toLowerCase())) {
+                    String n = a.name.toLowerCase();
+                    if (n.startsWith(k)) {
+                        front.add(a);
+                    } else if (n.contains(k) || a.desc.toLowerCase().contains(k)) {
                         out.add(a);
                     }
                 }
+                front.addAll(out);
+                out = front;
             }
+        } else if ("mine".equals(mode)) {
+            // 我的：只列已安装的，可更新的排最前
+            List<AppEntry> upd = new ArrayList<AppEntry>();
+            for (AppEntry a : all) {
+                String inst = PkgUtil.installedVerOf(this, a);
+                if (inst == null) continue;
+                if (a.ver.length() > 0 && !a.ver.equals(inst)) upd.add(a);
+                else out.add(a);
+            }
+            upd.addAll(out);
+            out = upd;
         } else if ("精选".equals(cat)) {
             out.addAll(all);
         } else {
             for (AppEntry a : all) {
                 if (cat.equals(a.cat)) out.add(a);
             }
+        }
+
+        if (sortByName) {
+            java.util.Collections.sort(out, new java.util.Comparator<AppEntry>() {
+                public int compare(AppEntry x, AppEntry y) {
+                    return x.name.compareToIgnoreCase(y.name);
+                }
+            });
         }
 
         adapter.setData(out);
@@ -161,6 +238,8 @@ public class MainActivity extends Activity {
                 empty.setText(R.string.empty);
             } else if ("search".equals(mode)) {
                 empty.setText("没搜到「" + kw + "」\n按 MENU 换个词，或按 BACK 返回");
+            } else if ("mine".equals(mode)) {
+                empty.setText("还没装过这里收录的应用\n装完会出现在这里，有新版也能一键更新");
             } else {
                 empty.setText("这个分类下暂时没有应用\n按 BACK 或点「精选」");
             }
@@ -173,9 +252,12 @@ public class MainActivity extends Activity {
     // ------------------------------------------------------------ 顶部标签
     private void buildTabs() {
         tabs.removeAllViews();
+        int upd = ("mine".equals(mode) || all.size() > 0) ? countUpdatable() : 0;
         for (final String c : CATS) {
             TextView t = new TextView(this);
-            t.setText(c);
+            String label = c;
+            if ("我的".equals(c) && upd > 0) label = "我的 " + upd;
+            t.setText(label);
             t.setTextSize(14);
             t.setTextColor(getResources().getColorStateList(R.drawable.tab_text));
             t.setBackgroundResource(R.drawable.tab_bg);
@@ -187,13 +269,19 @@ public class MainActivity extends Activity {
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.rightMargin = dp(6);
             t.setLayoutParams(lp);
-            t.setSelected(c.equals(cat) && "home".equals(mode));
+            boolean on = c.equals(cat) && !"search".equals(mode);
+            if ("搜索".equals(c)) on = "search".equals(mode);
+            t.setSelected(on);
             t.setNextFocusDownId(R.id.grid);
             t.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    mode = "home";
+                    if ("搜索".equals(c)) {
+                        showSearch();
+                        return;
+                    }
                     kw = "";
                     cat = c;
+                    mode = "我的".equals(c) ? "mine" : "home";
                     buildTabs();
                     applyFilter();
                 }
@@ -208,7 +296,7 @@ public class MainActivity extends Activity {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setBackgroundResource(R.drawable.dialog_bg);
         box.setPadding(dp(26), dp(24), dp(26), dp(24));
-        box.setLayoutParams(new LinearLayout.LayoutParams(dp(420),
+        box.setLayoutParams(new LinearLayout.LayoutParams(dp(440),
                 ViewGroup.LayoutParams.WRAP_CONTENT));
 
         final CardDialog dlg = new CardDialog(this, box);
@@ -225,41 +313,109 @@ public class MainActivity extends Activity {
         });
         box.addView(r1);
 
-        View r2 = row("刷新索引");
+        int upd = countUpdatable();
+        View r2 = row(upd > 0 ? ("更新全部（" + upd + " 个）") : "检查更新");
         r2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dlg.dismiss();
-                refresh();
-                Toast.makeText(MainActivity.this, "正在刷新索引", Toast.LENGTH_SHORT).show();
+                startUpdateAll();
             }
         });
         box.addView(r2);
 
-        View r3 = row("返回到「精选」");
+        View r3 = row(sortByName ? "排序：改回最近更新优先" : "排序：改成名称 A→Z");
         r3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dlg.dismiss();
-                mode = "home";
-                kw = "";
-                cat = "精选";
-                buildTabs();
+                sortByName = !sortByName;
                 applyFilter();
+                Toast.makeText(MainActivity.this,
+                        sortByName ? "已按名称排序" : "已按更新时间排序",
+                        Toast.LENGTH_SHORT).show();
             }
         });
         box.addView(r3);
 
-        View r4 = row("自定义索引地址");
+        View r4 = row("刷新索引");
         r4.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dlg.dismiss();
+                PkgUtil.invalidate();
+                refresh();
+                Toast.makeText(MainActivity.this, "正在刷新索引", Toast.LENGTH_SHORT).show();
+            }
+        });
+        box.addView(r4);
+
+        View r5 = row("自定义索引地址");
+        r5.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dlg.dismiss();
                 showIndexDialog();
             }
         });
-        box.addView(r4);
+        box.addView(r5);
+
+        View r6 = row("关于 / 安装权限");
+        r6.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dlg.dismiss();
+                showAbout();
+            }
+        });
+        box.addView(r6);
 
         ui.postDelayed(new Runnable() {
             public void run() {
                 r1.requestFocus();
+            }
+        }, 300);
+    }
+
+    private void showAbout() {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setBackgroundResource(R.drawable.dialog_bg);
+        box.setPadding(dp(26), dp(24), dp(26), dp(24));
+        box.setLayoutParams(new LinearLayout.LayoutParams(dp(520),
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        final CardDialog dlg = new CardDialog(this, box);
+        dlg.show();
+
+        box.addView(title("伟哥应用商店"));
+        TextView tv = new TextView(this);
+        tv.setTextColor(getResources().getColor(R.color.tx2));
+        tv.setTextSize(13);
+        tv.setLineSpacing(dp(6), 1f);
+        tv.setText("自己家用的电视应用商店，没有广告和推荐位。\n\n"
+                + "收录 " + all.size() + " 个应用，全部过大厂正版白名单："
+                + "只放行牌照方和大厂应用，棋牌、破解、加速器、清理大师一律不收。\n\n"
+                + "索引每 6 小时自动更新一次，不需要开着电脑。\n\n"
+                + "装应用时如果提示「禁止安装」，请在系统设置里允许本应用安装未知应用。");
+        box.addView(tv);
+
+        TextView ok = new TextView(this);
+        ok.setText("知道了");
+        ok.setTextSize(13);
+        ok.setTextColor(Color.WHITE);
+        ok.setBackgroundResource(R.drawable.btn_primary);
+        ok.setPadding(dp(30), dp(10), dp(30), dp(10));
+        ok.setFocusable(true);
+        ok.setClickable(true);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(16);
+        lp.gravity = Gravity.RIGHT;
+        ok.setLayoutParams(lp);
+        ok.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dlg.dismiss();
+            }
+        });
+        box.addView(ok);
+        ui.postDelayed(new Runnable() {
+            public void run() {
+                ok.requestFocus();
             }
         }, 300);
     }
@@ -404,15 +560,15 @@ public class MainActivity extends Activity {
 
         name.setText(e.name);
         StringBuilder sb = new StringBuilder();
-        if (e.ver.length() > 0) sb.append(e.ver).append(" · ");
+        if (e.ver.length() > 0) sb.append("版本 ").append(e.ver).append("   ");
         sb.append(AppAdapter.fmt(e.size));
-        if (e.cat.length() > 0) sb.append(" · ").append(e.cat);
-        if (e.day.length() > 0) sb.append(" · ").append(e.day);
+        if (e.cat.length() > 0) sb.append("   ").append(e.cat);
+        if (e.day.length() > 0) sb.append("   ").append(e.day).append(" 更新");
         meta.setText(sb.toString());
         desc.setText(e.desc.length() > 0 ? e.desc : "（这个应用没有简介）");
         ImageLoader.load(e.iconUrl, ic);
 
-        final String inst = PkgUtil.installedVer(this, e.pkg);
+        final String inst = PkgUtil.installedVerOf(this, e);
         boolean canOpen = false;
         String stateTxt = "";
         String actionTxt = getString(R.string.install);
@@ -441,8 +597,9 @@ public class MainActivity extends Activity {
             public void onClick(View x) {
                 dlg.dismiss();
                 if (openMode) {
-                    PkgUtil.openApp(MainActivity.this, e.pkg);
+                    PkgUtil.openApp(MainActivity.this, PkgUtil.resolvePkg(MainActivity.this, e));
                 } else {
+                    queue.clear();
                     startDownload(e);
                 }
             }
@@ -463,7 +620,8 @@ public class MainActivity extends Activity {
             return;
         }
         dlBox.setVisibility(View.VISIBLE);
-        dlText.setText("正在下载 " + e.name);
+        dlText.setText("正在下载 " + e.name
+                + (updTotal > 0 ? "（" + (updDone + 1) + "/" + updTotal + "）" : ""));
         dlPct.setText("0%");
         dlBar.setProgress(0);
         Downloader.download(this, e.apkUrl, e.id + ".apk", new Downloader.Cb() {
@@ -474,19 +632,27 @@ public class MainActivity extends Activity {
             }
 
             public void done(File f) {
+                // 顺便把真实包名记下来，下次判断「已安装」就是准的
+                String[] info = PkgUtil.apkInfo(MainActivity.this, f.getAbsolutePath());
+                if (info != null) PkgUtil.learn(MainActivity.this, e.id, info[0]);
                 dlText.setText("下载完成，正在调起安装：" + e.name);
                 dlPct.setText("100%");
                 install(f, e);
-                ui.postDelayed(new Runnable() {
-                    public void run() {
-                        dlBox.setVisibility(View.GONE);
-                    }
-                }, 3000);
+                if (updTotal == 0) {
+                    ui.postDelayed(new Runnable() {
+                        public void run() {
+                            dlBox.setVisibility(View.GONE);
+                        }
+                    }, 3000);
+                }
             }
 
             public void fail(String err) {
                 dlText.setText("下载失败：" + err);
                 dlPct.setText("");
+                updTotal = 0;
+                updDone = 0;
+                queue.clear();
                 ui.postDelayed(new Runnable() {
                     public void run() {
                         dlBox.setVisibility(View.GONE);
@@ -513,9 +679,43 @@ public class MainActivity extends Activity {
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             startActivity(i);
+            if (updTotal > 0) waitingInstall = true;   // 装完回来自动下一个
         } catch (Exception ex) {
             status.setText("调起安装器失败：" + ex.getMessage());
         }
+    }
+
+    // ------------------------------------------------------------ 批量更新
+    private void startUpdateAll() {
+        queue.clear();
+        for (AppEntry a : all) {
+            String inst = PkgUtil.installedVerOf(this, a);
+            if (inst != null && a.ver.length() > 0 && !a.ver.equals(inst)) queue.add(a);
+        }
+        if (queue.isEmpty()) {
+            Toast.makeText(this, "所有应用都是最新版", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        updTotal = queue.size();
+        updDone = 0;
+        Toast.makeText(this, "开始更新 " + updTotal + " 个应用，每个装完会自动下一个",
+                Toast.LENGTH_LONG).show();
+        nextInQueue();
+    }
+
+    private void nextInQueue() {
+        if (queue.isEmpty()) {
+            updTotal = 0;
+            updDone = 0;
+            dlBox.setVisibility(View.GONE);
+            Toast.makeText(this, "更新完成", Toast.LENGTH_SHORT).show();
+            PkgUtil.invalidate();
+            applyFilter();
+            return;
+        }
+        AppEntry e = queue.remove(0);
+        startDownload(e);
+        updDone++;
     }
 
     // ------------------------------------------------------------ 小工具

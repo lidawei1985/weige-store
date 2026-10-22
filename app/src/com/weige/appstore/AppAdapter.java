@@ -49,17 +49,21 @@ public class AppAdapter extends BaseAdapter {
 
         name.setText(e.name);
 
-        String inst = PkgUtil.installedVer(ctx, e.pkg);
+        String inst = PkgUtil.installedVerOf(ctx, e);
         if (inst != null) {
             if (e.ver.length() > 0 && !e.ver.equals(inst)) {
-                meta.setText("可更新 " + e.ver);
+                meta.setText("可更新 " + inst + " → " + e.ver);
+                meta.setTextColor(0xFFFFB020);
             } else {
                 meta.setText("已安装 " + inst);
+                meta.setTextColor(0xFF6FCF97);
             }
         } else if (e.ver.length() > 0) {
             meta.setText(e.ver + " · " + fmt(e.size));
+            meta.setTextColor(0xFF8B97A8);
         } else {
             meta.setText(fmt(e.size));
+            meta.setTextColor(0xFF8B97A8);
         }
 
         ImageLoader.load(e.iconUrl, icon);

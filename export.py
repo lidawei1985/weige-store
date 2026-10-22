@@ -28,6 +28,22 @@ import curation  # noqa: E402
 DESC_MAX = 110
 BLOCKED = [0]          # 被白名单拦掉的数量（用于日志）
 
+# 关键词探测：分类页每类只有几十条，会漏掉不少应用。
+# 用一批常用词搜一遍，把分类页没覆盖到的补进来（搜索每词约 10 条）。
+PROBE_WORDS = [
+    # 影音
+    "影视", "视频", "电影", "电视剧", "电视", "直播", "音乐", "K歌", "唱歌",
+    "戏曲", "相声", "综艺", "动漫", "纪录片", "投屏", "播放器", "4K",
+    # 儿童 / 教育
+    "儿童", "宝宝", "少儿", "幼儿", "早教", "绘本", "故事", "儿歌", "识字",
+    "拼音", "英语", "数学", "语文", "课堂", "学习", "百科", "科普", "国学",
+    # 工具
+    "网盘", "文件", "浏览器", "遥控", "输入法", "桌面", "壁纸", "助手",
+    "会议", "办公", "远程", "清理", "测速", "应用市场",
+    # 生活 / 其他
+    "健身", "瑜伽", "广场舞", "天气", "日历", "新闻", "财经", "购物", "游戏",
+]
+
 
 def slim(a, cat=""):
     d = a.get("desc", "") or ""
@@ -87,7 +103,7 @@ def build(out_path):
 
     for cid, name, group in src.CATS:
         try:
-            apps = src.fetch_cat(cid, group)
+            apps = src.fetch_cat(cid, group, max_pages=30)
             for a in apps:
                 merge(bag, a, group)
             print("  %-8s %3d 条" % (name, len(apps)))
@@ -104,6 +120,22 @@ def build(out_path):
     except Exception as e:
         errors.append("新秀榜: %s" % e)
         print("  新秀榜 失败: %s" % e)
+
+    # 关键词探测补漏
+    n_probe = 0
+    for kw in PROBE_WORDS:
+        try:
+            res = src.search(kw)
+            for a in res:
+                a["cat"] = a.get("cat", "")
+                before = len(bag)
+                merge(bag, a, a.get("cat", ""))
+                if len(bag) > before:
+                    n_probe += 1
+        except Exception as e:
+            errors.append("搜索%s: %s" % (kw, e))
+        time.sleep(0.3)
+    print("  %-8s 新增 %3d 条" % ("关键词探测", n_probe))
 
     fresh = len(bag)
     for k, v in old.items():

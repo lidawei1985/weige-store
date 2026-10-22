@@ -65,8 +65,14 @@ public class IndexApi {
     }
 
     public static void load(final Context ctx, final Cb cb) {
+        // 出厂索引既做兜底，也做"新鲜度基线"：比它旧的公网数据一律不收
+        final List<AppEntry> builtin = readAssets(ctx);
+        final long builtinTs = updatedTs;
         final List<AppEntry> cached = readCache(ctx);
-        final long cacheTs = updatedTs;
+        long cacheTs = updatedTs;
+        if (builtinTs > cacheTs) cacheTs = builtinTs;   // 以两者较新的为基线
+        final long baseTs = cacheTs;
+
         if (cached != null && !cached.isEmpty()) {
             UI.post(new Runnable() {
                 public void run() {
@@ -80,20 +86,7 @@ public class IndexApi {
                 for (String url : sources(ctx)) {
                     try {
                         String body = fetch(url);
-                        long ts = 0;
-                        try {
-                            ts = new JSONObject(body).optLong("updated", 0);
-                        } catch (Exception ignore) {
-                        }
-                        // 比本地缓存还旧 = CDN 甩回来的老数据，丢弃换下一个源
-                        if (cacheTs > 0 && ts > 0 && ts < cacheTs) {
-                            err = "源数据比本地旧，已跳过";
-                            continue;
-                        }
-                        final List<AppEntry> list = parse(body);
-                        if (list.size() < 20) {
-                            throw new Exception("条数太少(" + list.size() + ")");
-                        }
+                        final List<AppEntry> list = parseStrict(body, baseTs);
                         writeCache(ctx, body);
                         lastError = "";
                         UI.post(new Runnable() {
@@ -108,7 +101,6 @@ public class IndexApi {
                 }
 
                 // 网络全挂：用 APK 里自带的出厂索引
-                final List<AppEntry> builtin = readAssets(ctx);
                 if (builtin != null && !builtin.isEmpty()) {
                     lastError = err;
                     UI.post(new Runnable() {
@@ -131,6 +123,39 @@ public class IndexApi {
     }
 
     // ---------------------------------------------------------- 解析 / 缓存
+    /**
+     * 严格解析：三道校验，任何一条不过就丢弃换源。
+     * 1. 必须是过了安全白名单的索引（safe_only=true）——老版本索引没这个标记，直接拒
+     * 2. 不能比本地基线旧（防 CDN 缓存回退）
+     * 3. count 和实际条数要对得上（防半截文件）
+     */
+    private static List<AppEntry> parseStrict(String body, long baseTs) throws Exception {
+        JSONObject o = new JSONObject(body);
+        if (!o.optBoolean("safe_only", false)) {
+            throw new Exception("索引未经过安全筛选，已拒绝");
+        }
+        long ts = o.optLong("updated", 0);
+        if (baseTs > 0 && ts > 0 && ts < baseTs) {
+            throw new Exception("索引比本地旧，已跳过");
+        }
+        int cnt = o.optInt("count", 0);
+        JSONArray arr = o.optJSONArray("apps");
+        List<AppEntry> list = new ArrayList<AppEntry>();
+        if (arr != null) {
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject x = arr.optJSONObject(i);
+                if (x != null) list.add(AppEntry.from(x));
+            }
+        }
+        if (list.size() < 20) throw new Exception("条数太少(" + list.size() + ")");
+        if (cnt > 0 && Math.abs(cnt - list.size()) > 2) {
+            throw new Exception("条数校验失败(" + list.size() + "/" + cnt + ")");
+        }
+        updatedText = o.optString("updated_text", "");
+        updatedTs = ts;
+        return list;
+    }
+
     private static List<AppEntry> parse(String body) throws Exception {
         JSONObject o = new JSONObject(body);
         updatedText = o.optString("updated_text", "");
@@ -175,7 +200,13 @@ public class IndexApi {
         File f = cacheFile(c);
         if (!f.exists()) return null;
         try {
-            return parse(readAll(new java.io.FileInputStream(f)));
+            String body = readAll(new java.io.FileInputStream(f));
+            // 老版本留下的、没过白名单的缓存直接删掉，绝不能让它显出来
+            if (!new JSONObject(body).optBoolean("safe_only", false)) {
+                f.delete();
+                return null;
+            }
+            return parse(body);
         } catch (Exception e) {
             return null;
         }
