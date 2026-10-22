@@ -15,3 +15,5 @@ tmp/
 !self/**/*.png
 self_apk/.seen.json
 self_apk/watcher.log
+self/apk/com_gathin_tvhome.apk
+self_apk/com.gathin.tvhome.apk

@@ -53,20 +53,6 @@
       "icon": true
     },
     {
-      "pkg": "com.gathin.tvhome",
-      "slug": "xingmu-desktop",
-      "name": "星幕桌面",
-      "ver": "2.3",
-      "code": 4,
-      "size": 152719802,
-      "cat": "工具",
-      "desc": "星幕电视整合包的桌面，装上就是整机一套：开机直达自己的应用墙，没有系统广告",
-      "day": "2026-10-22",
-      "order": 5,
-      "icon": true,
-      "url": "https://github.com/lidawei1985/weige-store/releases/download/self-desktop/xingmu-desktop.apk"
-    },
-    {
       "pkg": "com.weige.fresh",
       "slug": "weige-fresh",
       "name": "伟哥保鲜",
@@ -78,6 +64,20 @@
       "day": "2026-10-22",
       "order": 5,
       "icon": true
+    },
+    {
+      "pkg": "com.gathin.tvhome",
+      "slug": "com_gathin_tvhome",
+      "name": "伟哥桌面",
+      "ver": "2.5.6",
+      "code": 5,
+      "size": 153251909,
+      "cat": "工具",
+      "desc": "",
+      "day": "2026-10-23",
+      "order": 5,
+      "icon": true,
+      "url": "https://github.com/lidawei1985/weige-store/releases/download/self-desktop/xingmu-desktop.apk"
     },
     {
       "pkg": "com.weige.appstore",
