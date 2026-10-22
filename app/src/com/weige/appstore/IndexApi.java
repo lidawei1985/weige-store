@@ -18,22 +18,25 @@ import java.util.List;
 
 /**
  * 索引读取器。
- * 数据是一份静态 index.json（由 GitHub Actions 每 6 小时自动生成），
- * 客户端拉下来缓存到本地，之后分类、搜索全在本地内存里做，秒开。
  *
- * 换仓库只改 SOURCES。
+ * 数据是一份静态 index.json（GitHub Actions 每 6 小时自动生成，已过安全白名单）。
+ * 三层容错，从近到远：
+ *   1. 本地缓存（秒开）
+ *   2. 公网源（ghproxy → jsDelivr → raw），并且拒绝「比本地更旧」的数据，
+ *      防止 CDN 缓存回退把老索引（可能没过滤）盖回来
+ *   3. APK 内置的出厂索引（assets/index.json），永远有一份干净数据兜底
  */
 public class IndexApi {
-    // ↓↓↓ 索引仓库（GitHub Actions 每 6 小时自动更新 site/index.json）↓↓↓
     private static final String USER = "lidawei1985";
     private static final String REPO = "weige-store";
+    private static final String RAW = "https://raw.githubusercontent.com/" + USER + "/" + REPO
+            + "/main/site/index.json";
 
-    /** 多源容错，按顺序试，谁先通用谁（实测 jsDelivr 在国内最稳） */
+    /** 实时源优先；jsDelivr 有 12 小时缓存，放后面当备份 */
     private static final String[] DEFAULT_SOURCES = {
+            "https://ghproxy.net/" + RAW,
             "https://cdn.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/site/index.json",
-            "https://ghproxy.net/https://raw.githubusercontent.com/" + USER + "/" + REPO
-                    + "/main/site/index.json",
-            "https://raw.githubusercontent.com/" + USER + "/" + REPO + "/main/site/index.json",
+            RAW,
     };
 
     public interface Cb {
@@ -43,8 +46,8 @@ public class IndexApi {
     }
 
     private static final Handler UI = new Handler(Looper.getMainLooper());
-    /** 索引的更新时间，界面上显示 */
     public static String updatedText = "";
+    public static long updatedTs = 0;
     public static String lastError = "";
 
     public static File cacheFile(Context c) {
@@ -63,6 +66,7 @@ public class IndexApi {
 
     public static void load(final Context ctx, final Cb cb) {
         final List<AppEntry> cached = readCache(ctx);
+        final long cacheTs = updatedTs;
         if (cached != null && !cached.isEmpty()) {
             UI.post(new Runnable() {
                 public void run() {
@@ -76,6 +80,16 @@ public class IndexApi {
                 for (String url : sources(ctx)) {
                     try {
                         String body = fetch(url);
+                        long ts = 0;
+                        try {
+                            ts = new JSONObject(body).optLong("updated", 0);
+                        } catch (Exception ignore) {
+                        }
+                        // 比本地缓存还旧 = CDN 甩回来的老数据，丢弃换下一个源
+                        if (cacheTs > 0 && ts > 0 && ts < cacheTs) {
+                            err = "源数据比本地旧，已跳过";
+                            continue;
+                        }
                         final List<AppEntry> list = parse(body);
                         if (list.size() < 20) {
                             throw new Exception("条数太少(" + list.size() + ")");
@@ -92,7 +106,18 @@ public class IndexApi {
                         err = e.getMessage();
                     }
                 }
-                lastError = err;
+
+                // 网络全挂：用 APK 里自带的出厂索引
+                final List<AppEntry> builtin = readAssets(ctx);
+                if (builtin != null && !builtin.isEmpty()) {
+                    lastError = err;
+                    UI.post(new Runnable() {
+                        public void run() {
+                            cb.ok(builtin, true);
+                        }
+                    });
+                    return;
+                }
                 if (cached == null || cached.isEmpty()) {
                     final String e = err;
                     UI.post(new Runnable() {
@@ -109,6 +134,7 @@ public class IndexApi {
     private static List<AppEntry> parse(String body) throws Exception {
         JSONObject o = new JSONObject(body);
         updatedText = o.optString("updated_text", "");
+        updatedTs = o.optLong("updated", 0);
         JSONArray arr = o.optJSONArray("apps");
         List<AppEntry> list = new ArrayList<AppEntry>();
         if (arr != null) {
@@ -118,6 +144,15 @@ public class IndexApi {
             }
         }
         return list;
+    }
+
+    private static String readAll(InputStream in) throws Exception {
+        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        byte[] b = new byte[16384];
+        int n;
+        while ((n = in.read(b)) > 0) bo.write(b, 0, n);
+        in.close();
+        return new String(bo.toByteArray(), "UTF-8");
     }
 
     private static String fetch(String url) throws Exception {
@@ -130,13 +165,7 @@ public class IndexApi {
             c.setInstanceFollowRedirects(true);
             int code = c.getResponseCode();
             if (code >= 400) throw new Exception("HTTP " + code);
-            InputStream in = c.getInputStream();
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            byte[] b = new byte[16384];
-            int n;
-            while ((n = in.read(b)) > 0) bo.write(b, 0, n);
-            in.close();
-            return new String(bo.toByteArray(), "UTF-8");
+            return readAll(c.getInputStream());
         } finally {
             if (c != null) c.disconnect();
         }
@@ -146,13 +175,15 @@ public class IndexApi {
         File f = cacheFile(c);
         if (!f.exists()) return null;
         try {
-            java.io.FileInputStream in = new java.io.FileInputStream(f);
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            byte[] b = new byte[16384];
-            int n;
-            while ((n = in.read(b)) > 0) bo.write(b, 0, n);
-            in.close();
-            return parse(new String(bo.toByteArray(), "UTF-8"));
+            return parse(readAll(new java.io.FileInputStream(f)));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static List<AppEntry> readAssets(Context c) {
+        try {
+            return parse(readAll(c.getAssets().open("index.json")));
         } catch (Exception e) {
             return null;
         }

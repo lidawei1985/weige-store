@@ -33,7 +33,7 @@ jobs:
           import json
           d = json.load(open('site/index.json', encoding='utf-8'))
           print('应用数:', d['count'], '失败分类:', d['errors'])
-          assert d['count'] > 100, '应用数异常偏低，保留旧索引不提交'
+          assert d['count'] > 50, '应用数异常偏低，保留旧索引不提交'
           PY
 
       - name: 提交

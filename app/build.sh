@@ -31,6 +31,7 @@ echo "==> 3/7 链接资源"
   -I "$(w "$PLATFORM")" \
   --manifest AndroidManifest.xml \
   --java build/gen \
+  -A assets \
   -o build/stage/base.apk
 
 echo "==> 4/7 编译 Java"
