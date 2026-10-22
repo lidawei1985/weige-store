@@ -4,6 +4,17 @@ on:
   schedule:
     - cron: "23 */6 * * *"      # 每 6 小时跑一次（UTC）
   workflow_dispatch:            # 也可以在 Actions 页面手动点一下
+  # 自己家的应用有新版本、或者改过抓取逻辑，推上来就立刻重跑。
+  # 注意不要把 site/index.json 列进来，否则 Actions 自己提交索引又会触发一遍，形成死循环。
+  push:
+    paths:
+      - "self/**"
+      - "self_apps.py"
+      - "export.py"
+      - "curation.py"
+      - "pinyin.py"
+      - "source_dangbei.py"
+      - ".github/workflows/update-index.yml"
 
 permissions:
   contents: write
