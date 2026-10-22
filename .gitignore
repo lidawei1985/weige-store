@@ -10,7 +10,6 @@ web/
 *.idsig
 t.json
 tmp/
-self_apk/
 *.jpg
 *.png
 !self/**/*.png
