@@ -53,20 +53,6 @@
       "icon": true
     },
     {
-      "pkg": "com.gathin.tvhome",
-      "slug": "com_gathin_tvhome",
-      "name": "伟哥桌面",
-      "ver": "2.5.8",
-      "code": 7,
-      "size": 153251909,
-      "cat": "工具",
-      "desc": "",
-      "day": "2026-10-23",
-      "order": 5,
-      "icon": true,
-      "url": "https://github.com/lidawei1985/weige-store/releases/download/self-desktop/xingmu-desktop.apk"
-    },
-    {
       "pkg": "com.weige.fresh",
       "slug": "weige-fresh",
       "name": "伟哥保鲜",
@@ -75,6 +61,19 @@
       "size": 244308,
       "cat": "工具",
       "desc": "伟哥保鲜，占位小工具",
+      "day": "2026-10-23",
+      "order": 5,
+      "icon": true
+    },
+    {
+      "pkg": "com.gathin.tvhome",
+      "slug": "com_gathin_tvhome",
+      "name": "伟哥桌面",
+      "ver": "2.5.10",
+      "code": 9,
+      "size": 153442453,
+      "cat": "工具",
+      "desc": "",
       "day": "2026-10-23",
       "order": 5,
       "icon": true
