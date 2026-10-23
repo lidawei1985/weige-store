@@ -11,8 +11,8 @@
      "logo": "https:\/\/tb.zbds.top\/logo\/CCTV1.png",
      "urls": [
       "http:\/\/74.91.26.218:82\/live\/cctv1hd.m3u8",
-      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/1\/live.m3u8",
-      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/1\/live.m3u8"
+      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/1\/live.m3u8",
+      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/1\/live.m3u8"
      ],
      "alive": 3
     },
@@ -21,10 +21,10 @@
      "no": 2,
      "logo": "https:\/\/tb.zbds.top\/logo\/CCTV2.png",
      "urls": [
-      "http:\/\/74.91.26.218:82\/live\/cctv2hd.m3u8",
       "http:\/\/198.204.228.26\/live\/cctv2hd.m3u8",
-      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/2\/live.m3u8",
-      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/2\/live.m3u8"
+      "http:\/\/74.91.26.218:82\/live\/cctv2hd.m3u8",
+      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/2\/live.m3u8",
+      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/2\/live.m3u8"
      ],
      "alive": 4
     },
@@ -34,8 +34,8 @@
      "logo": "https:\/\/tb.zbds.top\/logo\/CCTV3.png",
      "urls": [
       "http:\/\/74.91.26.218:82\/live\/cctv3hd.m3u8",
-      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/3\/live.m3u8",
-      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/3\/live.m3u8"
+      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/3\/live.m3u8",
+      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/3\/live.m3u8"
      ],
      "alive": 3
     },
@@ -44,12 +44,11 @@
      "no": 4,
      "logo": "https:\/\/tb.zbds.top\/logo\/CCTV4.png",
      "urls": [
-      "https:\/\/live-play-hls.cctvnews.cctv.com\/CCTVChannel\/channel_cctv4_mbd.m3u8?auth_key=1792699200-1-b59134a2ead43d7f783f943c8f535e7bb80c5169575b2e8efcd5b3ddea21b41c-d52c6c62aae4e7e465ca432ff2f403a9&yid=b59134a2ead43d7f783f943c8f535e7bb80c5169575b2e8efcd5b3ddea21b41c",
-      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/4\/live.m3u8",
       "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/4\/live.m3u8",
-      "http:\/\/113.25.252.226:9901\/tsfile\/live\/1008_1.m3u8?key=txiptv&playlive=1&authid=0"
+      "http:\/\/113.25.252.226:9901\/tsfile\/live\/1008_1.m3u8?key=txiptv&playlive=1&authid=0",
+      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/4\/live.m3u8"
      ],
-     "alive": 4
+     "alive": 3
     },
     {
      "name": "CCTV-5",
@@ -57,9 +56,9 @@
      "logo": "https:\/\/tb.zbds.top\/logo\/CCTV5.png",
      "urls": [
       "http:\/\/38.75.136.137:98\/gslb\/dsdqpub\/cctv5hd.m3u8?auth=testpub",
+      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/5\/live.m3u8",
       "http:\/\/153.0.171.163:85\/tsfile\/live\/1015_1.m3u8?key=txiptv&playlive=1&authid=0",
       "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/5\/live.m3u8",
-      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/5\/live.m3u8",
       "http:\/\/207.56.13.146:81\/cdnlive\/cctv5.m3u8"
      ],
      "alive": 5
@@ -135,11 +134,10 @@
      "urls": [
       "http:\/\/74.91.26.218:82\/live\/cctv11hd.m3u8",
       "http:\/\/38.75.136.137:98\/gslb\/dsdqbv\/cctv11hd.m3u8?auth=test20251009",
-      "http:\/\/219.159.147.195:9901\/tsfile\/live\/1013_1.m3u8?key=txiptv&playlive=1&authid=0",
       "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/12\/live.m3u8",
       "http:\/\/113.25.252.226:9901\/tsfile\/live\/1015_1.m3u8?key=txiptv&playlive=1&authid=0"
      ],
-     "alive": 5
+     "alive": 4
     },
     {
      "name": "CCTV-12",
@@ -147,10 +145,9 @@
      "logo": "https:\/\/tb.zbds.top\/logo\/CCTV12.png",
      "urls": [
       "http:\/\/74.91.26.218:82\/live\/cctv12hd.m3u8",
-      "http:\/\/124.165.251.82:85\/tsfile\/live\/0012_1.m3u8?key=txiptv&playlive=1&authid=0",
-      "http:\/\/219.159.147.195:9901\/tsfile\/live\/1014_1.m3u8?key=txiptv"
+      "http:\/\/124.165.251.82:85\/tsfile\/live\/0012_1.m3u8?key=txiptv&playlive=1&authid=0"
      ],
-     "alive": 3
+     "alive": 2
     },
     {
      "name": "CCTV-13",
@@ -170,11 +167,10 @@
      "logo": "https:\/\/tb.zbds.top\/logo\/CCTV14.png",
      "urls": [
       "http:\/\/74.91.26.218:82\/live\/cctv14hd.m3u8",
-      "http:\/\/219.159.147.195:9901\/tsfile\/live\/1020_1.m3u8?key=txiptv&playlive=1&authid=0",
       "http:\/\/113.25.252.226:9901\/tsfile\/live\/1018_1.m3u8?key=txiptv&playlive=1&authid=0",
       "https:\/\/event.pull.hebtv.com\/jishi\/cp2.m3u8"
      ],
-     "alive": 4
+     "alive": 3
     },
     {
      "name": "CCTV-15",
@@ -218,7 +214,7 @@
       "https:\/\/live-play-hls.cctvnews.cctv.com\/CCTVChannel\/channel_cctv4k_mbd.m3u8?auth_key=1792699200-1-b59134a2ead43d7f783f943c8f535e7bb80c5169575b2e8efcd5b3ddea21b41c-c4064a39c7ca0ebbbe81b6aedbc7ca1e&yid=b59134a2ead43d7f783f943c8f535e7bb80c5169575b2e8efcd5b3ddea21b41c",
       "http:\/\/198.204.240.250:82\/live\/cctv4k.m3u8"
      ],
-     "alive": 1
+     "alive": 0
     },
     {
      "name": "CCTV-8K",
@@ -347,8 +343,8 @@
      "logo": "https:\/\/tb.zbds.top\/logo\/CGTN.png",
      "urls": [
       "https:\/\/english-livebkali.cgtn.com\/live\/encgtn.m3u8",
-      "https:\/\/hlspackager.akamaized.net\/live\/DB\/CGTN_ENGLISH\/HLS\/CGTN_ENGLISH.m3u8",
       "https:\/\/amg00405-rakutentv-cgtn-rakuten-i9tar.amagi.tv\/master.m3u8",
+      "https:\/\/hlspackager.akamaized.net\/live\/DB\/CGTN_ENGLISH\/HLS\/CGTN_ENGLISH.m3u8",
       "http:\/\/english-livetx.cgtn.com\/hls\/yypdyyctzb_hd.m3u8",
       "https:\/\/0472.org\/hls\/cgtn.m3u8"
      ],
@@ -359,8 +355,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/CGTN纪录.png",
      "urls": [
-      "https:\/\/hlspackager.akamaized.net\/live\/DB\/CGTN_DOCUMENTARY\/HLS\/CGTN_DOCUMENTARY.m3u8",
       "https:\/\/amg00405-rakutentv-cgtndocumentary-rakuten-0ql8j.amagi.tv\/master.m3u8",
+      "https:\/\/hlspackager.akamaized.net\/live\/DB\/CGTN_DOCUMENTARY\/HLS\/CGTN_DOCUMENTARY.m3u8",
       "https:\/\/english-livetx.cgtn.com\/hls\/yypdjlctzb_hd.m3u8",
       "https:\/\/0472.org\/hls\/cgtnd.m3u8"
      ],
@@ -376,10 +372,11 @@
      "no": 101,
      "logo": "https:\/\/tb.zbds.top\/logo\/北京卫视.png",
      "urls": [
+      "http:\/\/219.159.147.195:9901\/tsfile\/live\/1024_1.m3u8?key=txiptv",
       "http:\/\/hlsztemgsplive.miguvideo.com:8080\/migu\/kailu\/bjws\/50\/20251127\/index.m3u8?msisdn=20261022080259ed16736db15341099da784fc2a2d8459&mdspid=&spid=600697&netType=0&sid=5910022306&pid=2028597139&timestamp=20261022080259&Channel_ID=0116_2600000900-99000-201600010010027&ProgramID=630287636&ParentNodeID=-99&assertID=5910022306&client_ip=171.8.79.254&SecurityKey=20261022080259&promotionId=&mvid=5101042960&mcid=500020&playurlVersion=WX-A1-9.10.1-SNAPSHOT&userid=&jmhm=&videocodec=h264&appCode=miguvideo_android&bean=mgspad&tid=android&conFee=0&encrypt=a8d85fe6c0d39e294cd2cf33ce2b7171",
       "http:\/\/hlsztemgsplive.miguvideo.com:8080\/migu\/kailu\/bjws\/50\/20251127\/index.m3u8?msisdn=20261021220259a19700320cd64f69b6d3f703b7e11aee&mdspid=&spid=600697&netType=0&sid=5910022306&pid=2028597139&timestamp=20261021220259&Channel_ID=0116_2600000900-99000-201600010010027&ProgramID=630287636&ParentNodeID=-99&assertID=5910022306&client_ip=171.8.79.254&SecurityKey=20261021220259&promotionId=&mvid=5101042960&mcid=500020&playurlVersion=WX-A1-9.10.1-SNAPSHOT&userid=&jmhm=&videocodec=h264&appCode=miguvideo_android&bean=mgspad&tid=android&conFee=0&encrypt=b7eb38ae14a9901dcafdcccfd610e6d3"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "天津卫视",
@@ -519,18 +516,19 @@
      "no": 117,
      "logo": "https:\/\/tb.zbds.top\/logo\/山东卫视.png",
      "urls": [
+      "http:\/\/219.159.147.195:9901\/tsfile\/live\/1029_1.m3u8?key=txiptv",
       "http:\/\/183.207.248.71\/cntv\/live1\/HD-2500k-1080P-shandongstv\/HD-2500k-1080P-shandongstv",
-      "http:\/\/219.159.147.195:9901\/tsfile\/live\/1029_1.m3u8?key=txiptv"
+      "http:\/\/39.134.115.163:8080\/PLTV\/88888910\/224\/3221225738\/index.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "河南卫视",
      "no": 118,
      "logo": "https:\/\/tb.zbds.top\/logo\/河南卫视.png",
      "urls": [
-      "http:\/\/221.226.51.220:50081\/newlive\/live\/hls\/37\/live.m3u8",
       "http:\/\/111.59.139.82:11888\/tsfile\/live\/0139_1.m3u8?key=txiptv&playlive=1&authid=0",
+      "http:\/\/221.226.51.220:50081\/newlive\/live\/hls\/37\/live.m3u8",
       "https:\/\/dxtx.hntv.tv\/live\/lypd.m3u8?txSecret=10c771842a0be59e8b575d765173ec96&txTime=7B923E0A&wsSecret=985ebb910dd1e9ad9603ffd7670bd155&wsTime=1791183481"
      ],
      "alive": 3
@@ -694,8 +692,8 @@
      "no": 135,
      "logo": "https:\/\/tb.zbds.top\/logo\/%E5%8E%A6%E9%97%A8%E5%8D%AB%E8%A7%86.png",
      "urls": [
-      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/28\/live.m3u8",
-      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/28\/live.m3u8"
+      "http:\/\/120.40.39.246:352\/newlive\/live\/hls\/28\/live.m3u8",
+      "http:\/\/113.57.140.161:10081\/newlive\/live\/hls\/28\/live.m3u8"
      ],
      "alive": 2
     },
@@ -744,8 +742,8 @@
      "no": 160,
      "logo": "https:\/\/tb.zbds.top\/logo\/东方卫视4K.png",
      "urls": [
-      "https:\/\/bp-resource-dfl.bestv.cn\/148\/3\/video.m3u8",
-      "http:\/\/bp-resource-dfl.bestv.cn\/148\/3\/video.m3u8"
+      "http:\/\/bp-resource-dfl.bestv.cn\/148\/3\/video.m3u8",
+      "https:\/\/bp-resource-dfl.bestv.cn\/148\/3\/video.m3u8"
      ],
      "alive": 2
     },
@@ -1247,8 +1245,8 @@
      "urls": [
       "http:\/\/38.75.136.137:98\/gslb\/dsdqpub\/chcjt.m3u8?auth=testpub",
       "http:\/\/107.150.60.122\/live\/chcjt.m3u8",
-      "http:\/\/198.204.228.26\/live\/chcjt.m3u8",
-      "http:\/\/192.151.150.154\/live\/chcjt.m3u8"
+      "http:\/\/192.151.150.154\/live\/chcjt.m3u8",
+      "http:\/\/198.204.228.26\/live\/chcjt.m3u8"
      ],
      "alive": 4
     },
@@ -1451,7 +1449,7 @@
      "urls": [
       "https:\/\/tencentplaybusiness.gztv.com\/live\/zonghes.m3u8"
      ],
-     "alive": 1
+     "alive": 0
     },
     {
      "name": "Guizhou TV",
@@ -1542,7 +1540,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV15.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "Jade",
@@ -1643,7 +1641,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV04.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "Momo 2",
@@ -1652,7 +1650,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV05.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "NTD TV",
@@ -1688,7 +1686,7 @@
      "urls": [
       "https:\/\/ntd02.akamaized.net\/HD-LA\/index.m3u8"
      ],
-     "alive": 1
+     "alive": 0
     },
     {
      "name": "NU",
@@ -1697,7 +1695,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV10.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "NU2",
@@ -1902,7 +1900,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV78.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "Thrill",
@@ -1985,9 +1983,9 @@
      "logo": "https:\/\/tb.zbds.top\/logo\/Xinjiang%20TV%203.png",
      "urls": [
       "https:\/\/st-video.xjmty.com\/fs\/livedit\/e55abfa37af26e19\/8ce9971c2177b3dd.m3u8",
-      "http:\/\/120.70.60.179:9901\/tsfile\/live\/1006_1.m3u8?authid=0&key=txiptv&playlive=1",
-      "http:\/\/120.70.60.179:9901\/tsfile\/live\/1006_1.m3u8?key=txiptv&playlive=1&authid=0",
       "http:\/\/218.84.35.38:3000\/m3u8\/live\/tctv-2\/index.m3u8",
+      "http:\/\/120.70.60.179:9901\/tsfile\/live\/1006_1.m3u8?key=txiptv&playlive=1&authid=0",
+      "http:\/\/120.70.60.179:9901\/tsfile\/live\/1006_1.m3u8?authid=0&key=txiptv&playlive=1",
       "http:\/\/110.153.180.106:55555\/out_2\/index.m3u8"
      ],
      "alive": 5
@@ -2585,8 +2583,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/伊犁经济法制.png",
      "urls": [
-      "http:\/\/110.153.180.106:55555\/out_4\/index.m3u8?zxinjd",
-      "http:\/\/110.153.180.106:55555\/out_4\/index.m3u8"
+      "http:\/\/110.153.180.106:55555\/out_4\/index.m3u8",
+      "http:\/\/110.153.180.106:55555\/out_4\/index.m3u8?zxinjd"
      ],
      "alive": 2
     },
@@ -2595,8 +2593,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/伊犁维吾尔.png",
      "urls": [
-      "http:\/\/110.153.180.106:55555\/out_2\/index.m3u8",
-      "http:\/\/110.153.180.106:55555\/out_2\/index.m3u8?zxinjd"
+      "http:\/\/110.153.180.106:55555\/out_2\/index.m3u8?zxinjd",
+      "http:\/\/110.153.180.106:55555\/out_2\/index.m3u8"
      ],
      "alive": 2
     },
@@ -2651,9 +2649,9 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/余姚新闻综合.png",
      "urls": [
+      "https:\/\/l.cztvcloud.com\/channels\/lantian\/SXyuyao1\/720p.m3u8",
       "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXyuyao1\/720p.m3u8?cWlkPSZzPTg3OWMwYmMyZDMzYTFhZGY3NDQxMjgyYTg1MmUzNTY0JmVzPTE3MDY2Nzc4NzMmdXVpZD0yMjdiY2MzNGNiNGY0MThlYjRiY2IxYzcwNmZjODNkMS02NzQ3NDY2NyZ2PTImYXM9MCZjZG5leF9pZD10eF9waG9uZV9saXZl",
-      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXyuyao1\/720p.m3u8",
-      "https:\/\/l.cztvcloud.com\/channels\/lantian\/SXyuyao1\/720p.m3u8"
+      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXyuyao1\/720p.m3u8"
      ],
      "alive": 3
     },
@@ -2692,7 +2690,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV07.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "倚天屠龙记",
@@ -3906,7 +3904,7 @@
       "https:\/\/tencentplay.gztv.com\/live\/zonghes.m3u8?txSecret=439b0fd2cf766b363c93a59cbcbe1370&txTime=18d00acf488",
       "https:\/\/tencentplaybusiness.gztv.com\/live\/zonghes.m3u8"
      ],
-     "alive": 2
+     "alive": 1
     },
     {
      "name": "广德生活",
@@ -4220,8 +4218,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/敦化一套.png",
      "urls": [
-      "http:\/\/stream8.jlntv.cn\/dhtv\/playlist.m3u8",
-      "http:\/\/stream8.jlntv.cn\/dhtv\/playlist.m3u8?zjild"
+      "http:\/\/stream8.jlntv.cn\/dhtv\/playlist.m3u8?zjild",
+      "http:\/\/stream8.jlntv.cn\/dhtv\/playlist.m3u8"
      ],
      "alive": 2
     },
@@ -4248,8 +4246,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/文成综合.png",
      "urls": [
-      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXwencheng1\/720p.m3u8?zzhed",
-      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXwencheng1\/720p.m3u8?zzhed?"
+      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXwencheng1\/720p.m3u8?zzhed?",
+      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXwencheng1\/720p.m3u8?zzhed"
      ],
      "alive": 2
     },
@@ -4377,7 +4375,7 @@
      "urls": [
       "https:\/\/zb-live.ynurl.com\/yimen\/3b75a2f9-7941-46b7-992d-a9796fbca5fe.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "晋江电视台",
@@ -4639,7 +4637,7 @@
      "urls": [
       "https:\/\/live.wjyanghu.com\/live\/CH1.m3u8"
      ],
-     "alive": 1
+     "alive": 0
     },
     {
      "name": "武进生活",
@@ -5110,8 +5108,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/浙江少儿.png",
      "urls": [
-      "https:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel008\/1080p.m3u8",
-      "http:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel008\/1080p.m3u8"
+      "http:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel008\/1080p.m3u8",
+      "https:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel008\/1080p.m3u8"
      ],
      "alive": 2
     },
@@ -5148,8 +5146,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/浙江数码时代.png",
      "urls": [
-      "http:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel12\/720p.m3u8",
-      "http:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel12\/720p.m3u8?zzhed"
+      "http:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel12\/720p.m3u8?zzhed",
+      "http:\/\/ali-m-l.cztv.com\/channels\/lantian\/channel12\/720p.m3u8"
      ],
      "alive": 2
     },
@@ -6175,7 +6173,7 @@
      "urls": [
       "http:\/\/live.zohi.tv\/video\/s10001-fztv-4\/index.m3u8"
      ],
-     "alive": 1
+     "alive": 0
     },
     {
      "name": "福州广播电视台新闻综合频道",
@@ -6211,7 +6209,7 @@
      "urls": [
       "http:\/\/live.zohi.tv\/video\/s10001-fztv-4\/index.m3u8"
      ],
-     "alive": 1
+     "alive": 0
     },
     {
      "name": "福建公共",
@@ -6399,8 +6397,8 @@
      "no": 400,
      "logo": "https:\/\/tb.zbds.top\/logo\/缙云综合.png",
      "urls": [
-      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXjinyun1\/720p.m3u8?zzhed?",
-      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXjinyun1\/720p.m3u8?zzhed"
+      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXjinyun1\/720p.m3u8?zzhed",
+      "http:\/\/l.cztvcloud.com\/channels\/lantian\/SXjinyun1\/720p.m3u8?zzhed?"
      ],
      "alive": 2
     },
@@ -6802,7 +6800,7 @@
      "urls": [
       "https:\/\/epg.pw\/stream\/c7df950876e6a1ceb8be74ee86f9f702cebbbae29f1d15124ef8f86fd43161cf.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "辉南新闻",
@@ -7272,7 +7270,7 @@
      "urls": [
       "http:\/\/iptv.4666888.xyz\/iptv2A.php?id=56"
      ],
-     "alive": 1
+     "alive": 0
     },
     {
      "name": "靖宇",
@@ -7712,7 +7710,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV03.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "中视新闻",
@@ -7748,8 +7746,8 @@
      "no": 200,
      "logo": "https:\/\/tb.zbds.top\/logo\/%E5%87%A4%E5%87%B0%E9%A6%99%E6%B8%AF.png",
      "urls": [
-      "http:\/\/122.152.202.33\/s\/81a8a44f\/index.m3u8?id=fhhk",
       "http:\/\/122.152.202.33\/s\/81a8a44f\/index.m3u8?id=fhhk TVB",
+      "http:\/\/122.152.202.33\/s\/81a8a44f\/index.m3u8?id=fhhk",
       "https:\/\/epg.pw\/stream\/8770e89223a086eb1b8a0c931e42296d772a8069ad3eb72540e0c434e7cb3e93.m3u8",
       "https:\/\/epg.pw\/stream\/5f16dc7fc8aaaed3205516c63e4a8c24bca9dbba1181684244729cf574505b0e.m3u8"
      ],
@@ -7887,7 +7885,7 @@
      "urls": [
       "https:\/\/0472.org\/hls\/cgtnx.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "CGTN阿拉伯语",
@@ -7905,7 +7903,7 @@
      "urls": [
       "https:\/\/0472.org\/hls\/cgtna.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "DW",
@@ -7914,7 +7912,7 @@
      "urls": [
       "https:\/\/raw.githubusercontent.com\/ChiSheng9\/iptv\/master\/TV08.m3u8"
      ],
-     "alive": 0
+     "alive": 1
     },
     {
      "name": "广西国际",
