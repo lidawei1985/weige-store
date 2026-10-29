@@ -13,6 +13,7 @@ tmp/
 *.jpg
 *.png
 !self/**/*.png
+!app/assets/self_icon/*.png
 self_apk/.seen.json
 self_apk/watcher.log
 self/apk/com_gathin_tvhome.apk

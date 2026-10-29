@@ -59,6 +59,32 @@ def _mkdirs():
         os.makedirs(d, exist_ok=True)
 
 
+def _compress_icon(path, max_side=512, quality_target=150 * 1024):
+    """图标统一压到 ≤512px、目标 ≤150KB（图标会打进商店 APK 的 assets，压大了纯浪费）。
+    失败不抛错（没装 Pillow 时静默跳过，不影响收录流程）。"""
+    try:
+        from PIL import Image
+    except ImportError:
+        return
+    try:
+        img = Image.open(path)
+        w, h = img.size
+        if max(w, h) > max_side:
+            scale = max_side / float(max(w, h))
+            img = img.resize((max(1, int(w * scale)), max(1, int(h * scale))),
+                             Image.LANCZOS)
+        if img.mode not in ("RGB", "RGBA"):
+            img = img.convert("RGBA" if "A" in img.mode or "transparency" in img.info
+                              else "RGB")
+        img.save(path, "PNG", optimize=True)
+        if os.path.getsize(path) > quality_target and img.mode == "RGBA":
+            # 还太大就丢 alpha 量化到 256 色
+            img = img.convert("RGB").quantize(colors=256, method=Image.MEDIANCUT)
+            img.save(path, "PNG", optimize=True)
+    except Exception as e:
+        print("  [warn] 图标压缩失败 %s: %s" % (os.path.basename(path), e))
+
+
 def load():
     try:
         with open(MANIFEST, encoding="utf-8") as f:
@@ -202,15 +228,19 @@ def add(apk_path, verbose=True):
     design = os.path.join(SELF_DIR, "design", slug + ".png")
     if os.path.exists(design):
         shutil.copyfile(design, dst_icon)
+        _compress_icon(dst_icon)
         has_icon = True
     else:
         has_icon = os.path.exists(icon_tmp)
         if has_icon:
             shutil.move(icon_tmp, dst_icon)
+            _compress_icon(dst_icon)
         else:
             # apkmeta 合不出（adaptive icon 被混淆过），自己再找一遍
             has_icon = (os.path.exists(dst_icon)
                         or _fallback_icon(apk_path, dst_icon, info.get("name") or slug))
+            if has_icon and os.path.exists(dst_icon):
+                _compress_icon(dst_icon)
 
     entry = {
         "pkg": pkg,
@@ -225,6 +255,15 @@ def add(apk_path, verbose=True):
         "order": len(apps),
         "icon": bool(has_icon),
     }
+    # 老条目如果有 Release url（>100MB 大文件走 Release 的），更新时必须保留，
+    # 否则云端 collect() 找不到仓库里的 APK 会把整个条目丢掉（2026-10-29 踩过）
+    if cur is not None and cur.get("url"):
+        entry["url"] = cur["url"]
+    if entry["size"] > 95 * 1024 * 1024 and not entry.get("url"):
+        print("  [warn] %s %.0fMB 超 git 100MB 且没有 url 字段！"
+              % (pkg, entry["size"] / 1048576.0))
+        print("         必须先 gh release upload 到 weige-store 仓库，"
+              "再往 self/apps.json 该条目补 url，否则线上索引会丢这条")
     if cur is not None:
         apps.remove(cur)
         entry["order"] = cur.get("order", len(apps))

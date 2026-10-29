@@ -5,7 +5,7 @@ set -e
 
 cd "$(dirname "$0")"
 APP_NAME="伟哥应用商店"
-VERSION="1.0"
+VERSION="1.9.1"
 
 SDK="${ANDROID_SDK:-C:/Users/sbqqq/Android}"
 BT="$SDK/build-tools/36.0.0"

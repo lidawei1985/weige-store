@@ -76,7 +76,8 @@
       "desc": "",
       "day": "2026-10-23",
       "order": 5,
-      "icon": true
+      "icon": true,
+      "url": "https://github.com/lidawei1985/weige-store/releases/download/self-desktop/com_gathin_tvhome.apk"
     },
     {
       "pkg": "com.weige.appstore",

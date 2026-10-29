@@ -22,7 +22,7 @@ import subprocess
 import sys
 import time
 
-STORE_DIR = r"F:\2026-10-22-14-49-53\cleanstore"
+STORE_DIR = r"F:\项目\04-伟哥商店\cleanstore"
 AAPT = r"C:\Users\sbqqq\Android\build-tools\36.0.0\aapt.exe"
 
 # 自动找 APK 的候选目录（相对本脚本所在目录）
