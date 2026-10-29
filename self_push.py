@@ -30,8 +30,8 @@ KNOWN_DIRS = {
         r"F:\AI_WORKSPACE\WorkBuddy\workspace\2026-08-31-18-44-00\yinghuo-tv-apk",
     ],
     "com.weige.live": [
-        r"F:\2026-10-22-14-36-54",
-        r"F:\2026-10-22-14-36-54\weige-live\app\build\outputs\apk\release",
+        r"F:\项目\05-伟哥直播与保鲜",
+        r"F:\项目\05-伟哥直播与保鲜\weige-live\app\build\outputs\apk\release",
     ],
     "com.weige.appstore": [
         os.path.join(BASE_DIR, "app"),
