@@ -140,6 +140,9 @@ public class ImageLoader {
             iv.setImageBitmap(b);
             return;
         }
+        // 必须先 setTag：loadAssetQuiet 渲染前会校验 key.equals(iv.getTag())，
+        // 不设 tag 校验永远失败，asset 图标一张都显示不出来（2026-10-29 实锤的病根）
+        iv.setTag(key);
         iv.setImageResource(R.drawable.ic_placeholder);
         loadAssetQuiet(path, iv, key);
     }

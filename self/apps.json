@@ -83,12 +83,12 @@
       "pkg": "com.weige.appstore",
       "slug": "weige-store",
       "name": "伟哥商店",
-      "ver": "1.9",
-      "code": 10,
-      "size": 2984776,
+      "ver": "1.9.2",
+      "code": 12,
+      "size": 1760485,
       "cat": "工具",
       "desc": "伟哥应用商店自己，换电视时用它把其它应用装回来",
-      "day": "2026-10-23",
+      "day": "2026-10-29",
       "order": 6,
       "icon": true
     }
